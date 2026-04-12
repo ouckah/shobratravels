@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { notifyNewRegistration } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -68,6 +69,15 @@ export async function POST(req: NextRequest) {
     });
 
     // TODO: Create Square payment link for credit_card/ach and email to client
+
+    notifyNewRegistration({
+      clientName: fullName,
+      clientEmail: email,
+      clientPhone: phone,
+      tripTitle: trip.title,
+      departureDate: trip.departureDate,
+      paymentMethod,
+    }).catch(console.error);
 
     return NextResponse.json({
       success: true,

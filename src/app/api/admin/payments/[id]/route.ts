@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { notifyPaymentReceived } from "@/lib/email";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -17,6 +18,24 @@ export async function PATCH(req: NextRequest, context: Context) {
   });
 
   if (status === "COMPLETED") {
+    const paymentWithDetails = await prisma.payment.findUnique({
+      where: { id },
+      include: {
+        client: { select: { fullName: true } },
+        registration: { include: { trip: { select: { title: true } } } },
+      },
+    });
+
+    if (paymentWithDetails) {
+      notifyPaymentReceived({
+        clientName: paymentWithDetails.client.fullName,
+        tripTitle: paymentWithDetails.registration.trip.title,
+        amount: paymentWithDetails.amount,
+        method: paymentWithDetails.method,
+        type: paymentWithDetails.type,
+      }).catch(console.error);
+    }
+
     const allPayments = await prisma.payment.findMany({
       where: { registrationId: payment.registrationId },
     });

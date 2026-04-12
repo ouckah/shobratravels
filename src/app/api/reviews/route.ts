@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { notifyNewReview } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,6 +28,13 @@ export async function POST(req: NextRequest) {
         approved: false,
       },
     });
+
+    const clampedRating = Math.min(5, Math.max(1, rating || 5));
+    notifyNewReview({
+      reviewerName: name,
+      rating: clampedRating,
+      content,
+    }).catch(console.error);
 
     return NextResponse.json({ success: true });
   } catch {
