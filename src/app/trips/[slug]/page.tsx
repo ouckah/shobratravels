@@ -1,0 +1,172 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Calendar, Users, MapPin, Clock, FileText } from "lucide-react";
+import { prisma } from "@/lib/db";
+import type { Metadata } from "next";
+
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const trip = await prisma.trip.findUnique({ where: { slug } });
+  if (!trip) return {};
+  return { title: trip.title, description: trip.description.slice(0, 160) };
+}
+
+export default async function TripDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const trip = await prisma.trip.findUnique({
+    where: { slug, published: true },
+  });
+
+  if (!trip) notFound();
+
+  return (
+    <>
+      {trip.heroImage && (
+        <div className="relative h-[50vh] md:h-[60vh]">
+          <img
+            src={trip.heroImage}
+            alt={trip.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+            <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-wider text-white">
+              {trip.title}
+            </h1>
+          </div>
+        </div>
+      )}
+
+      <section className="py-12 md:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              {!trip.heroImage && (
+                <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-8">
+                  {trip.title}
+                </h1>
+              )}
+
+              <div className="prose prose-neutral max-w-none">
+                <p className="text-lg leading-relaxed whitespace-pre-line">
+                  {trip.description}
+                </p>
+              </div>
+
+              {trip.inclusions && (
+                <div className="mt-10">
+                  <h2 className="text-xl font-bold uppercase tracking-wider mb-4">
+                    Inclusions
+                  </h2>
+                  <p className="text-neutral-600 whitespace-pre-line">
+                    {trip.inclusions}
+                  </p>
+                </div>
+              )}
+
+              {trip.exclusions && (
+                <div className="mt-8">
+                  <h2 className="text-xl font-bold uppercase tracking-wider mb-4">
+                    Exclusions
+                  </h2>
+                  <p className="text-neutral-600 whitespace-pre-line">
+                    {trip.exclusions}
+                  </p>
+                </div>
+              )}
+
+              {trip.galleryImages.length > 0 && (
+                <div className="mt-10">
+                  <h2 className="text-xl font-bold uppercase tracking-wider mb-4">
+                    Gallery
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {trip.galleryImages.map((img, i) => (
+                      <img
+                        key={i}
+                        src={img}
+                        alt={`${trip.title} - ${i + 1}`}
+                        className="w-full aspect-square object-cover"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="lg:col-span-1">
+              <div className="sticky top-24 bg-neutral-50 p-8 border border-neutral-200">
+                <p className="text-3xl font-bold mb-1">
+                  ${trip.pricePerPerson.toLocaleString()}
+                </p>
+                <p className="text-neutral-500 text-sm mb-6">
+                  per person (double occupancy)
+                </p>
+
+                {trip.singleSupplement && (
+                  <p className="text-sm text-neutral-500 mb-6">
+                    Single supplement: +$
+                    {trip.singleSupplement.toLocaleString()}
+                  </p>
+                )}
+
+                <div className="flex flex-col gap-3 text-sm mb-8">
+                  <div className="flex items-center gap-2 text-neutral-600">
+                    <Calendar size={16} />
+                    <span>
+                      {trip.departureDate.toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                      })}{" "}
+                      -{" "}
+                      {trip.returnDate.toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-neutral-600">
+                    <Clock size={16} />
+                    <span>{trip.duration}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-neutral-600">
+                    <MapPin size={16} />
+                    <span>{trip.destinations}</span>
+                  </div>
+                  {trip.groupSize && (
+                    <div className="flex items-center gap-2 text-neutral-600">
+                      <Users size={16} />
+                      <span>{trip.groupSize}</span>
+                    </div>
+                  )}
+                </div>
+
+                {trip.pdfUrl && (
+                  <a
+                    href={trip.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full bg-neutral-200 hover:bg-neutral-300 text-neutral-800 font-semibold py-3 uppercase tracking-wider text-sm transition-colors mb-3"
+                  >
+                    <FileText size={16} />
+                    Download Itinerary PDF
+                  </a>
+                )}
+
+                <Link
+                  href={`/register?trip=${trip.slug}`}
+                  className="block w-full bg-gold hover:bg-gold-dark text-primary text-center font-semibold py-3 uppercase tracking-wider text-sm transition-colors"
+                >
+                  Register for This Trip
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
