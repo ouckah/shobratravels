@@ -6,7 +6,10 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function EditTripPage({ params }: Props) {
   const { id } = await params;
-  const trip = await prisma.trip.findUnique({ where: { id } });
+  const trip = await prisma.trip.findUnique({
+    where: { id },
+    include: { dates: { orderBy: { departureDate: "asc" } } },
+  });
   if (!trip) notFound();
 
   const tripData = {
@@ -16,8 +19,10 @@ export default async function EditTripPage({ params }: Props) {
     description: trip.description,
     destinations: trip.destinations,
     duration: trip.duration,
-    departureDate: trip.departureDate.toISOString().split("T")[0],
-    returnDate: trip.returnDate.toISOString().split("T")[0],
+    dates: trip.dates.map((d) => ({
+      departureDate: d.departureDate.toISOString().split("T")[0],
+      returnDate: d.returnDate.toISOString().split("T")[0],
+    })),
     groupSize: trip.groupSize || "",
     pricePerPerson: trip.pricePerPerson,
     singleSupplement: trip.singleSupplement || 0,

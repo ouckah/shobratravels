@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
       homePhone,
       address,
       tripId,
+      tripDateId,
       passportNumber,
       passportCountry,
       passportIssued,
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
       sourceId,
     } = body;
 
-    if (!fullName || !email || !cellPhone || !address || !tripId || !passportNumber) {
+    if (!fullName || !email || !cellPhone || !address || !tripId || !tripDateId || !passportNumber) {
       return NextResponse.json(
         { error: "All required fields must be filled" },
         { status: 400 }
@@ -37,9 +38,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const trip = await prisma.trip.findUnique({ where: { id: tripId } });
+    const trip = await prisma.trip.findUnique({
+      where: { id: tripId },
+      include: { dates: { where: { id: tripDateId } } },
+    });
     if (!trip) {
       return NextResponse.json({ error: "Trip not found" }, { status: 404 });
+    }
+
+    const tripDate = trip.dates[0];
+    if (!tripDate) {
+      return NextResponse.json({ error: "Trip date not found" }, { status: 404 });
     }
 
     const phone = cellPhone + (homePhone ? ` / ${homePhone}` : "");
@@ -50,11 +59,11 @@ export async function POST(req: NextRequest) {
     });
 
     const existing = await prisma.registration.findUnique({
-      where: { clientId_tripId: { clientId: client.id, tripId } },
+      where: { clientId_tripDateId: { clientId: client.id, tripDateId } },
     });
     if (existing) {
       return NextResponse.json(
-        { error: "You are already registered for this trip." },
+        { error: "You are already registered for this trip date." },
         { status: 409 }
       );
     }
@@ -68,6 +77,7 @@ export async function POST(req: NextRequest) {
       data: {
         clientId: client.id,
         tripId,
+        tripDateId,
         passportNumber,
         passportCountry,
         passportIssued: new Date(passportIssued),
@@ -96,7 +106,7 @@ export async function POST(req: NextRequest) {
       clientEmail: email,
       clientPhone: cellPhone,
       tripTitle: trip.title,
-      departureDate: trip.departureDate,
+      departureDate: tripDate.departureDate,
       paymentMethod,
     }).catch(console.error);
 

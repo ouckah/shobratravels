@@ -28,8 +28,8 @@ async function main() {
     },
   });
 
-  // Seed the two current trips
-  await prisma.trip.upsert({
+  // Seed trips with multiple date options each
+  const turkey = await prisma.trip.upsert({
     where: { slug: "turkey-highlight-tour-seven-churches" },
     update: {},
     create: {
@@ -39,8 +39,6 @@ async function main() {
         "Small group exploration of Istanbul, Bursa, Kusadasi, Ephesus, and Cappadocia with optional cultural experiences and concluding in Istanbul or Ankara.",
       destinations: "Istanbul, Bursa, Kusadasi, Ephesus, Cappadocia",
       duration: "13 days",
-      departureDate: new Date("2025-09-14"),
-      returnDate: new Date("2025-09-26"),
       groupSize: "Small group",
       pricePerPerson: 4500,
       published: true,
@@ -48,7 +46,21 @@ async function main() {
     },
   });
 
-  await prisma.trip.upsert({
+  // Two date options per trip
+  const turkeyDates = [
+    { departureDate: new Date("2025-09-14"), returnDate: new Date("2025-09-26") },
+    { departureDate: new Date("2026-03-15"), returnDate: new Date("2026-03-27") },
+  ];
+  for (const d of turkeyDates) {
+    const exists = await prisma.tripDate.findFirst({
+      where: { tripId: turkey.id, departureDate: d.departureDate },
+    });
+    if (!exists) {
+      await prisma.tripDate.create({ data: { tripId: turkey.id, ...d } });
+    }
+  }
+
+  const machuPicchu = await prisma.trip.upsert({
     where: { slug: "sunrise-at-machu-picchu" },
     update: {},
     create: {
@@ -58,14 +70,25 @@ async function main() {
         "10 days, 9 nights exploring Lima, Cusco, Sacred Valley, and Machu Picchu. Includes private guided tours, accommodations, domestic flights, and select meals.",
       destinations: "Lima, Cusco, Sacred Valley, Machu Picchu",
       duration: "10 days, 9 nights",
-      departureDate: new Date("2025-05-12"),
-      returnDate: new Date("2025-05-21"),
       groupSize: "25-30 passengers",
       pricePerPerson: 3500,
       published: true,
       featured: true,
     },
   });
+
+  const machuPicchuDates = [
+    { departureDate: new Date("2025-05-12"), returnDate: new Date("2025-05-21") },
+    { departureDate: new Date("2025-10-05"), returnDate: new Date("2025-10-14") },
+  ];
+  for (const d of machuPicchuDates) {
+    const exists = await prisma.tripDate.findFirst({
+      where: { tripId: machuPicchu.id, departureDate: d.departureDate },
+    });
+    if (!exists) {
+      await prisma.tripDate.create({ data: { tripId: machuPicchu.id, ...d } });
+    }
+  }
 
   // Seed the existing testimonials as approved reviews
   const testimonials = [

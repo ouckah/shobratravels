@@ -15,8 +15,6 @@ export async function POST(req: NextRequest) {
       description: body.description,
       destinations: body.destinations,
       duration: body.duration,
-      departureDate: new Date(body.departureDate),
-      returnDate: new Date(body.returnDate),
       groupSize: body.groupSize || null,
       pricePerPerson: body.pricePerPerson,
       singleSupplement: body.singleSupplement || null,
@@ -26,7 +24,16 @@ export async function POST(req: NextRequest) {
       pdfUrl: body.pdfUrl || null,
       published: body.published,
       featured: body.featured,
+      dates: {
+        create: (body.dates as { departureDate: string; returnDate: string }[]).map(
+          (d) => ({
+            departureDate: new Date(d.departureDate),
+            returnDate: new Date(d.returnDate),
+          })
+        ),
+      },
     },
+    include: { dates: true },
   });
 
   return NextResponse.json(trip);

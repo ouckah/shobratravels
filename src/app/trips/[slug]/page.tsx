@@ -17,6 +17,7 @@ export default async function TripDetailPage({ params }: Props) {
   const { slug } = await params;
   const trip = await prisma.trip.findUnique({
     where: { slug, published: true },
+    include: { dates: { orderBy: { departureDate: "asc" } } },
   });
 
   if (!trip) notFound();
@@ -113,21 +114,23 @@ export default async function TripDetailPage({ params }: Props) {
                 )}
 
                 <div className="flex flex-col gap-3 text-sm mb-8">
-                  <div className="flex items-center gap-2 text-neutral-600">
-                    <Calendar size={16} />
-                    <span>
-                      {trip.departureDate.toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                      })}{" "}
-                      -{" "}
-                      {trip.returnDate.toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
+                  {trip.dates.map((d) => (
+                    <div key={d.id} className="flex items-center gap-2 text-neutral-600">
+                      <Calendar size={16} />
+                      <span>
+                        {d.departureDate.toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                        })}{" "}
+                        –{" "}
+                        {d.returnDate.toLocaleDateString("en-US", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                  ))}
                   <div className="flex items-center gap-2 text-neutral-600">
                     <Clock size={16} />
                     <span>{trip.duration}</span>

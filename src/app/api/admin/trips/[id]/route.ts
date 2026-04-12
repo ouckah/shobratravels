@@ -11,6 +11,9 @@ export async function PUT(req: NextRequest, context: Context) {
   const { id } = await context.params;
   const body = await req.json();
 
+  // Delete existing dates and recreate
+  await prisma.tripDate.deleteMany({ where: { tripId: id } });
+
   const trip = await prisma.trip.update({
     where: { id },
     data: {
@@ -19,8 +22,6 @@ export async function PUT(req: NextRequest, context: Context) {
       description: body.description,
       destinations: body.destinations,
       duration: body.duration,
-      departureDate: new Date(body.departureDate),
-      returnDate: new Date(body.returnDate),
       groupSize: body.groupSize || null,
       pricePerPerson: body.pricePerPerson,
       singleSupplement: body.singleSupplement || null,
@@ -30,7 +31,16 @@ export async function PUT(req: NextRequest, context: Context) {
       pdfUrl: body.pdfUrl || null,
       published: body.published,
       featured: body.featured,
+      dates: {
+        create: (body.dates as { departureDate: string; returnDate: string }[]).map(
+          (d) => ({
+            departureDate: new Date(d.departureDate),
+            returnDate: new Date(d.returnDate),
+          })
+        ),
+      },
     },
+    include: { dates: true },
   });
 
   return NextResponse.json(trip);

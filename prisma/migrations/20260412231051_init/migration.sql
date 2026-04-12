@@ -12,8 +12,8 @@ CREATE TABLE "Client" (
     "id" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "phone" TEXT,
-    "address" TEXT,
+    "phone" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -28,8 +28,6 @@ CREATE TABLE "Trip" (
     "description" TEXT NOT NULL,
     "destinations" TEXT NOT NULL,
     "duration" TEXT NOT NULL,
-    "departureDate" TIMESTAMP(3) NOT NULL,
-    "returnDate" TIMESTAMP(3) NOT NULL,
     "groupSize" TEXT,
     "pricePerPerson" DOUBLE PRECISION NOT NULL,
     "singleSupplement" DOUBLE PRECISION,
@@ -47,10 +45,21 @@ CREATE TABLE "Trip" (
 );
 
 -- CreateTable
+CREATE TABLE "TripDate" (
+    "id" TEXT NOT NULL,
+    "tripId" TEXT NOT NULL,
+    "departureDate" TIMESTAMP(3) NOT NULL,
+    "returnDate" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "TripDate_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Registration" (
     "id" TEXT NOT NULL,
     "clientId" TEXT NOT NULL,
     "tripId" TEXT NOT NULL,
+    "tripDateId" TEXT NOT NULL,
     "passportNumber" TEXT NOT NULL,
     "passportCountry" TEXT NOT NULL,
     "passportIssued" TIMESTAMP(3) NOT NULL,
@@ -127,16 +136,22 @@ CREATE UNIQUE INDEX "Client_email_key" ON "Client"("email");
 CREATE UNIQUE INDEX "Trip_slug_key" ON "Trip"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Registration_clientId_tripId_key" ON "Registration"("clientId", "tripId");
+CREATE UNIQUE INDEX "Registration_clientId_tripDateId_key" ON "Registration"("clientId", "tripDateId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AdminUser_email_key" ON "AdminUser"("email");
+
+-- AddForeignKey
+ALTER TABLE "TripDate" ADD CONSTRAINT "TripDate_tripId_fkey" FOREIGN KEY ("tripId") REFERENCES "Trip"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Registration" ADD CONSTRAINT "Registration_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Registration" ADD CONSTRAINT "Registration_tripId_fkey" FOREIGN KEY ("tripId") REFERENCES "Trip"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Registration" ADD CONSTRAINT "Registration_tripDateId_fkey" FOREIGN KEY ("tripDateId") REFERENCES "TripDate"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Payment" ADD CONSTRAINT "Payment_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

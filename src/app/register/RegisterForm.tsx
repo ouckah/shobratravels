@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   User,
@@ -11,27 +11,48 @@ import {
   ChevronRight,
   ChevronLeft,
   Building2,
+  AlertTriangle,
+  Calendar,
 } from "lucide-react";
 import SquarePayment from "@/components/SquarePayment";
 
 const STEPS = [
   { label: "Personal", icon: User },
-  { label: "Trip", icon: MapPin },
+  { label: "Trips", icon: MapPin },
   { label: "Passport", icon: BookOpen },
   { label: "Payment", icon: CreditCard },
 ];
 
+type TripDate = {
+  id: string;
+  departureDate: string;
+  returnDate: string;
+};
+
+type Trip = {
+  id: string;
+  slug: string;
+  title: string;
+  pricePerPerson: number;
+  duration: string;
+  dates: TripDate[];
+};
+
+type SelectedTrip = {
+  tripId: string;
+  tripDateId: string;
+};
+
 export default function RegisterForm() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
-  const [trips, setTrips] = useState<
-    { id: string; slug: string; title: string; departureDate: string }[]
-  >([]);
+  const [trips, setTrips] = useState<Trip[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
-
   const [authorized, setAuthorized] = useState(false);
+
+  const [selectedTrips, setSelectedTrips] = useState<SelectedTrip[]>([]);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -39,7 +60,6 @@ export default function RegisterForm() {
     homePhone: "",
     cellPhone: "",
     address: "",
-    tripId: "",
     passportNumber: "",
     passportCountry: "",
     passportIssued: "",
@@ -51,31 +71,40 @@ export default function RegisterForm() {
   useEffect(() => {
     fetch("/api/trips")
       .then((r) => r.json())
-      .then((data) => {
+      .then((data: Trip[]) => {
         setTrips(data);
         const tripSlug = searchParams.get("trip");
         if (tripSlug) {
-          const match = data.find(
-            (t: { slug: string }) => t.slug === tripSlug
-          );
-          if (match) setForm((f) => ({ ...f, tripId: match.id }));
+          const match = data.find((t) => t.slug === tripSlug);
+          if (match && match.dates.length > 0) {
+            setSelectedTrips([
+              { tripId: match.id, tripDateId: match.dates[0].id },
+            ]);
+          }
         }
       });
   }, [searchParams]);
 
-  // Called by SquarePayment after tokenizing — submits everything at once
   const handleFullSubmit = async (sourceId: string) => {
     setSubmitting(true);
     setError("");
     try {
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, sourceId }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Registration failed");
+      // Submit one registration per selected trip
+      for (const sel of selectedTrips) {
+        const res = await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...form,
+            tripId: sel.tripId,
+            tripDateId: sel.tripDateId,
+            sourceId,
+          }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Registration failed");
+        }
       }
       setSubmitted(true);
     } catch (err) {
@@ -88,10 +117,39 @@ export default function RegisterForm() {
   const update = (field: string, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
 
+  // Check for date collisions between selected trips
+  const dateCollision = useMemo(() => {
+    if (selectedTrips.length < 2) return null;
+
+    for (let i = 0; i < selectedTrips.length; i++) {
+      for (let j = i + 1; j < selectedTrips.length; j++) {
+        const tripA = trips.find((t) => t.id === selectedTrips[i].tripId);
+        const tripB = trips.find((t) => t.id === selectedTrips[j].tripId);
+        const dateA = tripA?.dates.find(
+          (d) => d.id === selectedTrips[i].tripDateId
+        );
+        const dateB = tripB?.dates.find(
+          (d) => d.id === selectedTrips[j].tripDateId
+        );
+        if (!dateA || !dateB) continue;
+
+        const aStart = new Date(dateA.departureDate).getTime();
+        const aEnd = new Date(dateA.returnDate).getTime();
+        const bStart = new Date(dateB.departureDate).getTime();
+        const bEnd = new Date(dateB.returnDate).getTime();
+
+        if (aStart <= bEnd && bStart <= aEnd) {
+          return `"${tripA?.title}" and "${tripB?.title}" have overlapping dates. Please choose different dates.`;
+        }
+      }
+    }
+    return null;
+  }, [selectedTrips, trips]);
+
   const canAdvance = () => {
     if (step === 0)
       return form.fullName && form.email && form.cellPhone && form.address;
-    if (step === 1) return form.tripId;
+    if (step === 1) return selectedTrips.length > 0 && !dateCollision;
     if (step === 2)
       return (
         form.passportNumber &&
@@ -103,13 +161,40 @@ export default function RegisterForm() {
     return true;
   };
 
-  const selectedTrip = trips.find((t) => t.id === form.tripId);
+  // Calculate total based on all selected trips
+  const totalDeposit = selectedTrips.length * 1200;
   const isCC = form.paymentMethod === "credit_card";
-  const totalCents = isCC ? 124680 : 120000; // $1,246.80 or $1,200.00
-  const displayTotal = isCC ? "$1,246.80" : "$1,200.00";
+  const ccFee = Math.round(totalDeposit * 0.039 * 100) / 100;
+  const totalAmount = isCC ? totalDeposit + ccFee : totalDeposit;
+  const totalCents = Math.round(totalAmount * 100);
+  const displayTotal = `$${totalAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
   const displayFee = isCC ? "3.9% processing fee" : "No processing fee";
 
-  // Success state
+  const tripPrice = useMemo(() => {
+    return selectedTrips.reduce((sum, sel) => {
+      const trip = trips.find((t) => t.id === sel.tripId);
+      return sum + (trip?.pricePerPerson || 0);
+    }, 0);
+  }, [selectedTrips, trips]);
+
+  const toggleTrip = (tripId: string) => {
+    setSelectedTrips((prev) => {
+      const existing = prev.find((s) => s.tripId === tripId);
+      if (existing) {
+        return prev.filter((s) => s.tripId !== tripId);
+      }
+      const trip = trips.find((t) => t.id === tripId);
+      if (!trip || trip.dates.length === 0) return prev;
+      return [...prev, { tripId, tripDateId: trip.dates[0].id }];
+    });
+  };
+
+  const setTripDate = (tripId: string, tripDateId: string) => {
+    setSelectedTrips((prev) =>
+      prev.map((s) => (s.tripId === tripId ? { ...s, tripDateId } : s))
+    );
+  };
+
   if (submitted) {
     return (
       <section className="py-24 md:py-36">
@@ -130,12 +215,15 @@ export default function RegisterForm() {
               <span className="text-neutral-500">Traveler</span>
               <span className="font-semibold">{form.fullName}</span>
             </div>
-            {selectedTrip && (
-              <div className="flex justify-between">
-                <span className="text-neutral-500">Trip</span>
-                <span className="font-semibold">{selectedTrip.title}</span>
-              </div>
-            )}
+            {selectedTrips.map((sel) => {
+              const trip = trips.find((t) => t.id === sel.tripId);
+              return (
+                <div key={sel.tripId} className="flex justify-between">
+                  <span className="text-neutral-500">Trip</span>
+                  <span className="font-semibold">{trip?.title}</span>
+                </div>
+              );
+            })}
             <div className="flex justify-between">
               <span className="text-neutral-500">Deposit Paid</span>
               <span className="font-semibold">{displayTotal}</span>
@@ -150,15 +238,16 @@ export default function RegisterForm() {
     );
   }
 
-  // Step 4 is now handled inline below (payment method + embedded checkout combined)
-
   return (
     <section className="py-12 md:py-20">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Step Indicator */}
         <div className="flex items-center justify-between mb-14">
           {STEPS.map((s, i) => (
-            <div key={s.label} className="flex items-center flex-1 last:flex-none">
+            <div
+              key={s.label}
+              className="flex items-center flex-1 last:flex-none"
+            >
               <button
                 onClick={() => i < step && setStep(i)}
                 className={`flex items-center gap-2 transition-colors ${
@@ -253,7 +342,10 @@ export default function RegisterForm() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-2">
-                    Home Phone <span className="text-neutral-400 normal-case tracking-normal">(optional)</span>
+                    Home Phone{" "}
+                    <span className="text-neutral-400 normal-case tracking-normal">
+                      (optional)
+                    </span>
                   </label>
                   <input
                     type="tel"
@@ -283,60 +375,142 @@ export default function RegisterForm() {
           {step === 1 && (
             <div>
               <h2 className="text-2xl font-bold uppercase tracking-wider mb-2">
-                Choose Your Tour
+                Choose Your Tours
               </h2>
               <p className="text-neutral-500 text-sm mb-8">
-                Select the trip you&apos;d like to join.
+                Select one or more trips and pick your preferred dates. Deposit
+                is <strong>$1,200 per trip</strong>.
               </p>
-              <div className="flex flex-col gap-3">
-                {trips.map((trip) => (
-                  <button
-                    key={trip.id}
-                    type="button"
-                    onClick={() => update("tripId", trip.id)}
-                    className={`w-full text-left p-5 border-2 transition-all ${
-                      form.tripId === trip.id
-                        ? "border-accent bg-green-50"
-                        : "border-neutral-200 hover:border-neutral-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-bold uppercase tracking-wider text-sm">
-                          {trip.title}
-                        </p>
-                        <p className="text-neutral-500 text-sm mt-1">
-                          Departing{" "}
-                          {new Date(trip.departureDate).toLocaleDateString(
-                            "en-US",
-                            { month: "long", day: "numeric", year: "numeric" }
-                          )}
-                        </p>
-                      </div>
-                      <div
-                        className={`w-5 h-5 border-2 flex items-center justify-center shrink-0 ${
-                          form.tripId === trip.id
-                            ? "border-accent bg-accent"
-                            : "border-neutral-300"
-                        }`}
+              <div className="flex flex-col gap-4">
+                {trips.map((trip) => {
+                  const isSelected = selectedTrips.some(
+                    (s) => s.tripId === trip.id
+                  );
+                  const selectedDate = selectedTrips.find(
+                    (s) => s.tripId === trip.id
+                  )?.tripDateId;
+
+                  return (
+                    <div
+                      key={trip.id}
+                      className={`border-2 transition-all ${
+                        isSelected
+                          ? "border-accent bg-green-50"
+                          : "border-neutral-200"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => toggleTrip(trip.id)}
+                        className="w-full text-left p-5"
                       >
-                        {form.tripId === trip.id && (
-                          <Check
-                            size={12}
-                            className="text-white"
-                            strokeWidth={3}
-                          />
-                        )}
-                      </div>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-bold uppercase tracking-wider text-sm">
+                              {trip.title}
+                            </p>
+                            <p className="text-neutral-500 text-xs mt-1">
+                              {trip.duration} &middot; $1,200 deposit
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className="font-bold text-lg">
+                              ${trip.pricePerPerson.toLocaleString()}
+                            </span>
+                            <div
+                              className={`w-5 h-5 border-2 flex items-center justify-center ${
+                                isSelected
+                                  ? "border-accent bg-accent"
+                                  : "border-neutral-300"
+                              }`}
+                            >
+                              {isSelected && (
+                                <Check
+                                  size={12}
+                                  className="text-white"
+                                  strokeWidth={3}
+                                />
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+
+                      {isSelected && trip.dates.length > 0 && (
+                        <div className="px-5 pb-5 pt-0">
+                          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-3">
+                            Select Dates
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {trip.dates.map((d) => (
+                              <button
+                                key={d.id}
+                                type="button"
+                                onClick={() => setTripDate(trip.id, d.id)}
+                                className={`flex items-center gap-2 px-4 py-2 text-sm border transition-all ${
+                                  selectedDate === d.id
+                                    ? "border-accent bg-accent text-white"
+                                    : "border-neutral-300 hover:border-neutral-400"
+                                }`}
+                              >
+                                <Calendar size={13} />
+                                {new Date(d.departureDate).toLocaleDateString(
+                                  "en-US",
+                                  { month: "short", day: "numeric" }
+                                )}{" "}
+                                –{" "}
+                                {new Date(d.returnDate).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  }
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </button>
-                ))}
+                  );
+                })}
                 {trips.length === 0 && (
                   <p className="text-neutral-400 py-8 text-center">
                     Loading available tours...
                   </p>
                 )}
               </div>
+
+              {/* Date collision warning */}
+              {dateCollision && (
+                <div className="mt-6 bg-red-50 border border-red-200 text-red-700 px-5 py-3 text-sm flex items-start gap-3">
+                  <AlertTriangle size={18} className="shrink-0 mt-0.5" />
+                  <p>{dateCollision}</p>
+                </div>
+              )}
+
+              {/* Selected summary */}
+              {selectedTrips.length > 0 && !dateCollision && (
+                <div className="mt-6 bg-green-50 border border-green-200 p-4 text-sm">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-neutral-500">
+                      {selectedTrips.length}{" "}
+                      {selectedTrips.length === 1 ? "trip" : "trips"} selected
+                    </span>
+                    <span className="text-neutral-500">
+                      Total trip cost: $
+                      {tripPrice.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-bold">
+                    <span>Deposit required</span>
+                    <span>
+                      ${(selectedTrips.length * 1200).toLocaleString()}.00
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -420,8 +594,9 @@ export default function RegisterForm() {
                 Payment Method
               </h2>
               <p className="text-neutral-500 text-sm mb-8">
-                Choose how you&apos;d like to pay your <strong>$1,200</strong>{" "}
-                deposit.
+                Deposit of <strong>${totalDeposit.toLocaleString()}.00</strong>{" "}
+                for {selectedTrips.length}{" "}
+                {selectedTrips.length === 1 ? "trip" : "trips"}.
               </p>
               <div className="flex flex-col gap-3">
                 <button
@@ -455,7 +630,9 @@ export default function RegisterForm() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-bold">$1,200.00</p>
+                      <p className="font-bold">
+                        ${totalDeposit.toLocaleString()}.00
+                      </p>
                       <p className="text-accent text-xs font-semibold">
                         No fee
                       </p>
@@ -491,7 +668,7 @@ export default function RegisterForm() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-bold">$1,246.80</p>
+                      <p className="font-bold">{displayTotal}</p>
                       <p className="text-neutral-400 text-xs">3.9% fee</p>
                     </div>
                   </div>
@@ -500,14 +677,41 @@ export default function RegisterForm() {
 
               {/* Order summary */}
               <div className="bg-green-50 border border-green-200 p-5 mt-8 text-sm">
-                <div className="flex justify-between mb-2">
-                  <span className="text-neutral-500">Trip deposit</span>
-                  <span>$1,200.00</span>
-                </div>
-                <div className="flex justify-between mb-2">
-                  <span className="text-neutral-500">Processing fee</span>
-                  <span>{isCC ? "$46.80" : "$0.00"}</span>
-                </div>
+                {selectedTrips.map((sel) => {
+                  const trip = trips.find((t) => t.id === sel.tripId);
+                  const date = trip?.dates.find(
+                    (d) => d.id === sel.tripDateId
+                  );
+                  return (
+                    <div
+                      key={sel.tripId}
+                      className="flex justify-between mb-2"
+                    >
+                      <span className="text-neutral-500 truncate mr-4">
+                        {trip?.title}
+                        {date && (
+                          <span className="text-neutral-400">
+                            {" "}
+                            &middot;{" "}
+                            {new Date(date.departureDate).toLocaleDateString(
+                              "en-US",
+                              { month: "short", day: "numeric" }
+                            )}
+                          </span>
+                        )}
+                      </span>
+                      <span className="shrink-0">$1,200.00</span>
+                    </div>
+                  );
+                })}
+                {isCC && (
+                  <div className="flex justify-between mb-2">
+                    <span className="text-neutral-500">
+                      Processing fee (3.9%)
+                    </span>
+                    <span>${ccFee.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between pt-2 border-t border-green-200 font-bold">
                   <span>Total</span>
                   <span>{displayTotal}</span>
@@ -524,9 +728,10 @@ export default function RegisterForm() {
                 />
                 <span className="text-xs text-neutral-500 leading-relaxed">
                   I authorize Shobra Travel Agency, LLC to charge the selected
-                  payment method for the deposit amount shown above. I understand
-                  my registration will not be complete until the deposit payment
-                  is received. <span className="text-neutral-400">ARC-31-76913-5</span>
+                  payment method for the deposit amount shown above. I
+                  understand my registration will not be complete until the
+                  deposit payment is received.{" "}
+                  <span className="text-neutral-400">ARC-31-76913-5</span>
                 </span>
               </label>
 
@@ -534,7 +739,7 @@ export default function RegisterForm() {
               {authorized && (
                 <SquarePayment
                   method={form.paymentMethod as "credit_card" | "ach"}
-                  transactionId={form.tripId}
+                  transactionId={selectedTrips[0]?.tripDateId || ""}
                   holderName={form.fullName}
                   totalCents={totalCents}
                   total={displayTotal}
@@ -587,7 +792,10 @@ export default function RegisterForm() {
           <div className="mt-6">
             <button
               type="button"
-              onClick={() => { setStep(2); setAuthorized(false); }}
+              onClick={() => {
+                setStep(2);
+                setAuthorized(false);
+              }}
               className="flex items-center gap-2 text-sm uppercase tracking-wider font-semibold text-neutral-500 hover:text-neutral-800 transition-colors"
             >
               <ChevronLeft size={16} />

@@ -4,8 +4,11 @@ import { Plus, Pencil, Eye, EyeOff } from "lucide-react";
 
 export default async function AdminTripsPage() {
   const trips = await prisma.trip.findMany({
-    orderBy: { departureDate: "desc" },
-    include: { _count: { select: { registrations: true } } },
+    orderBy: { createdAt: "desc" },
+    include: {
+      dates: { orderBy: { departureDate: "asc" }, take: 1 },
+      _count: { select: { registrations: true } },
+    },
   });
 
   return (
@@ -48,11 +51,13 @@ export default async function AdminTripsPage() {
                     </p>
                   </td>
                   <td className="px-6 py-3">
-                    {trip.departureDate.toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {trip.dates[0]
+                      ? trip.dates[0].departureDate.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "No dates"}
                   </td>
                   <td className="px-6 py-3">
                     ${trip.pricePerPerson.toLocaleString()}

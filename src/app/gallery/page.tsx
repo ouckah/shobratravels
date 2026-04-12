@@ -12,7 +12,7 @@ export default async function GalleryPage() {
   const trips = await prisma.trip.findMany({
     where: { published: true, galleryImages: { isEmpty: false } },
     select: { title: true, galleryImages: true, slug: true },
-    orderBy: { departureDate: "desc" },
+    orderBy: { createdAt: "desc" },
   });
 
   const allImages = trips.flatMap((trip) =>
