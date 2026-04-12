@@ -1,48 +1,52 @@
 import Link from "next/link";
-import { MapPin, Calendar, Users, Star } from "lucide-react";
+import Image from "next/image";
+import { MapPin, Calendar, Users, Star, ArrowRight, Quote } from "lucide-react";
 
-const features = [
+const pillars = [
   {
+    number: "01",
     title: "Elevated Experiences",
     description:
-      "Your needs and desires are unique, and we believe you deserve to work with a travel company that can guide you through designing and executing extraordinary experiences. When you partner with us, you will work directly with our team of expert advisors to create fully customized itineraries.",
-    icon: Star,
+      "Work directly with our team of expert advisors to design and execute extraordinary, fully customized itineraries tailored to your desires.",
   },
   {
-    title: "Custom Itineraries",
+    number: "02",
+    title: "Cultural Immersion",
     description:
-      "If you seek unique travel experiences that capture the essence of a destination, immersing you in the culture and connecting you with local customs and traditions, our itineraries will excite and inspire.",
-    icon: MapPin,
+      "Capture the essence of every destination — immerse yourself in local customs, traditions, and authentic experiences that inspire.",
   },
   {
-    title: "Trusted Travel Partners",
+    number: "03",
+    title: "Trusted Partners",
     description:
-      "We have partnered with the best hotels and local tour operators to give you the best trip of your life. We, together with our network of partners, make sure that you get the best deals and have that seamless and fun travel experience.",
-    icon: Users,
+      "We&apos;ve partnered with the finest hotels and local operators worldwide to guarantee seamless, world-class travel from start to finish.",
   },
   {
+    number: "04",
     title: "VIP Treatment",
     description:
-      "To provide you with unmatched service and design incredible trips, we work exclusively with trusted and highly vetted suppliers worldwide. We maintain a strong commitment to eco-stewardship and responsible travel experiences.",
-    icon: Calendar,
+      "Exclusively vetted suppliers, eco-conscious practices, and unmatched personal service — because you deserve nothing less.",
   },
 ];
 
 const testimonials = [
   {
     name: "Corazon Baltazar Calalang",
+    location: "Manila, Philippines",
     quote:
       "Thank you very much to Tessie Peralta for arranging a boutique tour — small group, first class accommodations and authentic dining experiences. Super grateful for the memories made with family and new friends that will last forever.",
   },
   {
     name: "Delia Aguinaldo",
+    location: "New Jersey, USA",
     quote:
       "I have traveled with Shobra Travel Agency spearheaded by Ms. Teresita Peralta and the most I can say is that we got the best accommodations and have seen beautiful historical, cultural and spiritual places unexpectedly.",
   },
   {
     name: "Dinah Lewkowicz",
+    location: "Short Hills, NJ",
     quote:
-      "A well curated journey, a well balanced travel that cater to older clients. The places we have been to has a lot of archeological, historical and biblical sites. To me, these are priceless. Absolutely beautiful places.",
+      "A well curated journey, a well balanced travel that caters to older clients. The places we have been to has a lot of archeological, historical and biblical sites. To me, these are priceless. Absolutely beautiful places.",
   },
 ];
 
@@ -50,7 +54,7 @@ export default function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative bg-primary text-white">
+      <section className="relative bg-primary text-white min-h-[85vh] flex items-center">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{
@@ -58,30 +62,38 @@ export default function HomePage() {
               "url('https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1920&q=80')",
           }}
         />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-48">
-          <h1 className="text-4xl md:text-6xl font-bold uppercase tracking-wider mb-6">
-            Discover the World&apos;s
+        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-transparent" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+          <p className="text-accent-light text-sm uppercase tracking-[0.3em] mb-6">
+            Cultural &bull; Historical &bull; Boutique
+          </p>
+          <h1 className="text-5xl md:text-7xl font-bold uppercase tracking-wider mb-8 leading-[0.95]">
+            Discover the
             <br />
-            Most Incredible
+            World&apos;s Most
+            <br />
+            <span className="text-accent-light">Incredible</span>
             <br />
             Destinations
           </h1>
-          <p className="text-lg md:text-xl text-green-200/80 max-w-2xl mb-10 leading-relaxed">
-            Are you a discerning traveler seeking to explore and discover the
-            world&apos;s most incredible destinations? Stop settling for plain
-            uninspired vacations. Discover how our boutique travel experiences
-            curated specifically for YOU will transform your travels.
+          <p className="text-lg text-green-200/60 max-w-md mb-12 leading-relaxed">
+            Stop settling for plain, uninspired vacations. Our boutique
+            experiences are curated specifically for you.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
               href="/trips"
-              className="bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-3 uppercase tracking-wider text-sm transition-colors"
+              className="group bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-4 uppercase tracking-wider text-sm transition-colors inline-flex items-center gap-3"
             >
               View All Trips
+              <ArrowRight
+                size={16}
+                className="group-hover:translate-x-1 transition-transform"
+              />
             </Link>
             <Link
               href="/register"
-              className="border border-white hover:bg-white hover:text-primary px-8 py-3 uppercase tracking-wider text-sm transition-colors"
+              className="border border-white/30 hover:bg-white hover:text-primary px-8 py-4 uppercase tracking-wider text-sm transition-colors"
             >
               Register Now
             </Link>
@@ -89,26 +101,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20 md:py-28">
+      {/* Pillars — editorial numbered list */}
+      <section className="py-24 md:py-36">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wider text-center mb-16">
-            What We Offer
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {features.map((feature) => (
-              <div key={feature.title} className="flex gap-5">
-                <div className="shrink-0">
-                  <div className="w-12 h-12 bg-primary text-accent-light flex items-center justify-center rounded-lg">
-                    <feature.icon size={24} />
-                  </div>
-                </div>
-                <div>
+          <div className="max-w-md mb-20">
+            <p className="text-accent text-sm uppercase tracking-[0.3em] mb-3">
+              Why Shobra
+            </p>
+            <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-wider leading-tight">
+              Travel With
+              <br />
+              Confidence
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-14">
+            {pillars.map((pillar) => (
+              <div
+                key={pillar.number}
+                className="group flex gap-6 items-start"
+              >
+                <span className="text-5xl font-bold text-green-100 group-hover:text-accent transition-colors shrink-0 leading-none">
+                  {pillar.number}
+                </span>
+                <div className="pt-1">
                   <h3 className="text-lg font-bold uppercase tracking-wider mb-3">
-                    {feature.title}
+                    {pillar.title}
                   </h3>
-                  <p className="text-neutral-600 leading-relaxed">
-                    {feature.description}
+                  <p className="text-neutral-500 leading-relaxed text-[15px]">
+                    {pillar.description}
                   </p>
                 </div>
               </div>
@@ -117,48 +138,70 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-primary text-white py-20">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-6">
-            Ready for Your Next Adventure?
-          </h2>
-          <p className="text-green-200/70 mb-10 text-lg">
-            Fill out the registration form to reserve your spot on one of our
-            upcoming trips. A deposit of $1,200 per traveler is required to
-            secure your booking.
-          </p>
+      {/* CTA — full-bleed */}
+      <section className="relative bg-primary text-white overflow-hidden">
+        <div className="absolute right-0 top-0 w-1/2 h-full bg-accent/5" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 flex flex-col md:flex-row items-center justify-between gap-10">
+          <div className="max-w-lg">
+            <p className="text-accent-light text-sm uppercase tracking-[0.3em] mb-3">
+              Limited Spots
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-4">
+              Ready for Your Next Adventure?
+            </h2>
+            <p className="text-green-200/60 leading-relaxed">
+              A deposit of $1,200 per traveler secures your booking. We handle
+              the rest — flights, accommodations, tours, and unforgettable
+              memories.
+            </p>
+          </div>
           <Link
             href="/register"
-            className="inline-block bg-accent hover:bg-accent-dark text-white font-semibold px-10 py-4 uppercase tracking-wider text-sm transition-colors"
+            className="group bg-accent hover:bg-accent-dark text-white font-semibold px-10 py-4 uppercase tracking-wider text-sm transition-colors inline-flex items-center gap-3 shrink-0"
           >
             Register Now
+            <ArrowRight
+              size={16}
+              className="group-hover:translate-x-1 transition-transform"
+            />
           </Link>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 md:py-28 bg-green-50">
+      {/* Testimonials — editorial pull-quote style */}
+      <section className="py-24 md:py-36 bg-green-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wider text-center mb-16">
-            What Our Travelers Say
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((t) => (
-              <div
-                key={t.name}
-                className="bg-white p-8 border border-green-200 rounded-lg"
-              >
-                <div className="flex gap-1 text-accent mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} fill="currentColor" />
+          <div className="text-center mb-20">
+            <p className="text-accent text-sm uppercase tracking-[0.3em] mb-3">
+              Testimonials
+            </p>
+            <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-wider">
+              Traveler Stories
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:gap-0 divide-y md:divide-y-0 md:divide-x divide-green-200">
+            {testimonials.map((t, i) => (
+              <div key={t.name} className="px-4 md:px-10 py-10 md:py-0 relative">
+                <Quote
+                  size={32}
+                  className="text-accent/20 mb-6"
+                  fill="currentColor"
+                  strokeWidth={0}
+                />
+                <p className="text-neutral-600 leading-relaxed mb-8 text-[15px]">
+                  {t.quote}
+                </p>
+                <div className="flex items-center gap-1 text-accent mb-4">
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} size={12} fill="currentColor" />
                   ))}
                 </div>
-                <p className="text-neutral-600 leading-relaxed mb-6 italic">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <p className="font-semibold uppercase tracking-wider text-sm">
+                <p className="font-bold uppercase tracking-wider text-sm">
                   {t.name}
+                </p>
+                <p className="text-neutral-400 text-xs mt-1 tracking-wider">
+                  {t.location}
                 </p>
               </div>
             ))}
