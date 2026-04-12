@@ -26,7 +26,7 @@ export default function RegisterPage() {
           </h1>
           <p className="text-green-200/60 max-w-lg text-lg leading-relaxed">
             Complete the form below to secure your place on an upcoming tour.
-            Your $1,200 deposit guarantees your spot.
+            Secure your spot and pay online.
           </p>
 
           <div className="mt-12 flex flex-wrap gap-8 text-sm">

@@ -70,8 +70,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Process payment FIRST — if this fails, no registration is created
-    const { deposit, fee, total } = calculateTotal(paymentMethod);
-    const squarePayment = await processPayment(sourceId, paymentMethod, email);
+    const { base, fee, total } = calculateTotal(paymentMethod, trip.pricePerPerson);
+    const amountCents = Math.round(total * 100);
+    const squarePayment = await processPayment(sourceId, amountCents, email, trip.title);
 
     // Payment succeeded — now create registration + payment record
     const registration = await prisma.registration.create({
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
         passportIssuedBy,
         passportImage: passportImage || null,
         paymentMethod,
-        status: "DEPOSIT_PAID",
+        status: "FULLY_PAID",
       },
     });
 
@@ -94,9 +95,9 @@ export async function POST(req: NextRequest) {
       data: {
         clientId: client.id,
         registrationId: registration.id,
-        amount: deposit,
+        amount: base,
         processingFee: fee,
-        type: "DEPOSIT",
+        type: "FINAL",
         status: "COMPLETED",
         method: paymentMethod,
         squarePaymentId: squarePayment?.id || null,

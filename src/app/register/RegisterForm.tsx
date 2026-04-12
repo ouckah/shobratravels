@@ -167,21 +167,20 @@ export default function RegisterForm() {
     return true;
   };
 
-  // Calculate total based on all selected trips
-  const totalDeposit = selectedTrips.length * 1200;
-  const isCC = form.paymentMethod === "credit_card";
-  const ccFee = Math.round(totalDeposit * 0.039 * 100) / 100;
-  const totalAmount = isCC ? totalDeposit + ccFee : totalDeposit;
-  const totalCents = Math.round(totalAmount * 100);
-  const displayTotal = `$${totalAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
-  const displayFee = isCC ? "3.9% processing fee" : "No processing fee";
-
-  const tripPrice = useMemo(() => {
+  // Calculate total based on all selected trips — full price, not a flat deposit
+  const tripTotal = useMemo(() => {
     return selectedTrips.reduce((sum, sel) => {
       const trip = trips.find((t) => t.id === sel.tripId);
       return sum + (trip?.pricePerPerson || 0);
     }, 0);
   }, [selectedTrips, trips]);
+
+  const isCC = form.paymentMethod === "credit_card";
+  const ccFee = Math.round(tripTotal * 0.039 * 100) / 100;
+  const totalAmount = isCC ? tripTotal + ccFee : tripTotal;
+  const totalCents = Math.round(totalAmount * 100);
+  const displayTotal = `$${totalAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+  const displayFee = isCC ? "3.9% processing fee" : "No processing fee";
 
   const toggleTrip = (tripId: string) => {
     setSelectedTrips((prev) => {
@@ -231,7 +230,7 @@ export default function RegisterForm() {
               );
             })}
             <div className="flex justify-between">
-              <span className="text-neutral-500">Deposit Paid</span>
+              <span className="text-neutral-500">Amount Paid</span>
               <span className="font-semibold">{displayTotal}</span>
             </div>
             <div className="flex justify-between">
@@ -416,7 +415,7 @@ export default function RegisterForm() {
                               {trip.title}
                             </p>
                             <p className="text-neutral-500 text-xs mt-1">
-                              {trip.duration} &middot; $1,200 deposit
+                              {trip.duration} &middot; per person
                             </p>
                           </div>
                           <div className="flex items-center gap-3 shrink-0">
@@ -505,7 +504,7 @@ export default function RegisterForm() {
                       {selectedTrips.length === 1 ? "trip" : "trips"} selected
                     </span>
                     <span>
-                      ${tripPrice.toLocaleString()} total
+                      ${tripTotal.toLocaleString()} total
                     </span>
                   </div>
                 </div>
@@ -672,7 +671,10 @@ export default function RegisterForm() {
                 Payment Method
               </h2>
               <p className="text-neutral-500 text-sm mb-8">
-                Deposit of <strong>${totalDeposit.toLocaleString()}.00</strong>{" "}
+                Total of{" "}
+                <strong>
+                  ${tripTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </strong>{" "}
                 for {selectedTrips.length}{" "}
                 {selectedTrips.length === 1 ? "trip" : "trips"}.
               </p>
@@ -709,7 +711,7 @@ export default function RegisterForm() {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="font-bold">
-                        ${totalDeposit.toLocaleString()}.00
+                        ${tripTotal.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                       </p>
                       <p className="text-accent text-xs font-semibold">
                         No fee
@@ -746,7 +748,9 @@ export default function RegisterForm() {
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-bold">{displayTotal}</p>
+                      <p className="font-bold">
+                        ${(tripTotal + Math.round(tripTotal * 0.039 * 100) / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </p>
                       <p className="text-neutral-400 text-xs">3.9% fee</p>
                     </div>
                   </div>
@@ -786,24 +790,16 @@ export default function RegisterForm() {
                     </div>
                   );
                 })}
-                <div className="flex justify-between pt-3 border-t border-green-200 mb-2">
-                  <span className="text-neutral-500">
-                    Deposit ({selectedTrips.length}{" "}
-                    {selectedTrips.length === 1 ? "trip" : "trips"} &times;
-                    $1,200)
-                  </span>
-                  <span>${totalDeposit.toLocaleString()}.00</span>
-                </div>
                 {isCC && (
-                  <div className="flex justify-between mb-2">
+                  <div className="flex justify-between pt-3 border-t border-green-200 mb-2">
                     <span className="text-neutral-500">
                       Processing fee (3.9%)
                     </span>
                     <span>${ccFee.toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between pt-2 border-t border-green-200 font-bold">
-                  <span>Total due today</span>
+                <div className={`flex justify-between font-bold ${isCC ? "pt-2 border-t border-green-200" : "pt-3 border-t border-green-200"}`}>
+                  <span>Total</span>
                   <span>{displayTotal}</span>
                 </div>
               </div>

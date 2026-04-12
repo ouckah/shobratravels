@@ -150,9 +150,8 @@ export default function HomePage() {
               Ready for Your Next Adventure?
             </h2>
             <p className="text-green-200/60 leading-relaxed">
-              A deposit of $1,200 per traveler secures your booking. We handle
-              the rest — flights, accommodations, tours, and unforgettable
-              memories.
+              Register and pay securely online. We handle the rest —
+              flights, accommodations, tours, and unforgettable memories.
             </p>
           </div>
           <Link
