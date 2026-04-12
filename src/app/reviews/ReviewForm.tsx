@@ -42,7 +42,7 @@ export default function ReviewForm() {
           required
           value={form.name}
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
         />
       </div>
       <div>
@@ -61,7 +61,7 @@ export default function ReviewForm() {
                 size={24}
                 className={
                   star <= (hover || rating)
-                    ? "text-gold fill-gold"
+                    ? "text-accent fill-accent"
                     : "text-neutral-300"
                 }
               />
@@ -78,13 +78,13 @@ export default function ReviewForm() {
           rows={4}
           value={form.content}
           onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold resize-none"
+          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent resize-none"
         />
       </div>
       <button
         type="submit"
         disabled={submitting}
-        className="bg-gold hover:bg-gold-dark text-primary font-semibold py-3 uppercase tracking-wider text-sm transition-colors disabled:opacity-50"
+        className="bg-accent hover:bg-accent-dark text-white font-semibold py-3 uppercase tracking-wider text-sm transition-colors disabled:opacity-50"
       >
         {submitting ? "Submitting..." : "Submit Review"}
       </button>

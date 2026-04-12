@@ -23,7 +23,7 @@ export default async function ReviewsPage() {
           <h1 className="text-4xl md:text-5xl font-bold uppercase tracking-wider">
             Reviews
           </h1>
-          <p className="text-neutral-400 mt-4 text-lg">
+          <p className="text-green-200/70 mt-4 text-lg">
             Hear from travelers who have experienced our tours.
           </p>
         </div>
@@ -42,7 +42,7 @@ export default async function ReviewsPage() {
                   key={review.id}
                   className="border border-neutral-200 p-8"
                 >
-                  <div className="flex gap-1 text-gold mb-4">
+                  <div className="flex gap-1 text-accent mb-4">
                     {[...Array(review.rating)].map((_, i) => (
                       <Star key={i} size={16} fill="currentColor" />
                     ))}

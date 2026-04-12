@@ -97,7 +97,7 @@ export default async function TripDetailPage({ params }: Props) {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="sticky top-24 bg-neutral-50 p-8 border border-neutral-200">
+              <div className="sticky top-24 bg-green-50 p-8 border border-neutral-200">
                 <p className="text-3xl font-bold mb-1">
                   ${trip.pricePerPerson.toLocaleString()}
                 </p>
@@ -158,7 +158,7 @@ export default async function TripDetailPage({ params }: Props) {
 
                 <Link
                   href={`/register?trip=${trip.slug}`}
-                  className="block w-full bg-gold hover:bg-gold-dark text-primary text-center font-semibold py-3 uppercase tracking-wider text-sm transition-colors"
+                  className="block w-full bg-accent hover:bg-accent-dark text-white text-center font-semibold py-3 uppercase tracking-wider text-sm transition-colors"
                 >
                   Register for This Trip
                 </Link>

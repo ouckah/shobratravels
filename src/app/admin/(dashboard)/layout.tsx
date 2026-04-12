@@ -30,25 +30,25 @@ export default async function AdminDashboardLayout({
   return (
     <div className="flex min-h-screen bg-neutral-100">
       <aside className="w-64 bg-primary text-white flex flex-col shrink-0">
-        <div className="p-6 border-b border-neutral-800">
+        <div className="p-6 border-b border-green-700">
           <h2 className="font-bold uppercase tracking-wider text-sm">
             Shobra Admin
           </h2>
-          <p className="text-neutral-500 text-xs mt-1">{admin.name}</p>
+          <p className="text-green-300 text-xs mt-1">{admin.name}</p>
         </div>
         <nav className="flex-1 py-4">
           {sidebarLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="flex items-center gap-3 px-6 py-3 text-sm text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+              className="flex items-center gap-3 px-6 py-3 text-sm text-green-200/70 hover:text-white hover:bg-green-700 transition-colors"
             >
               <link.icon size={18} />
               {link.label}
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-neutral-800">
+        <div className="p-4 border-t border-green-700">
           <AdminLogout />
         </div>
       </aside>

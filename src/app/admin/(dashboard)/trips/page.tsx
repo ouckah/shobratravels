@@ -14,7 +14,7 @@ export default async function AdminTripsPage() {
         <h1 className="text-2xl font-bold uppercase tracking-wider">Trips</h1>
         <Link
           href="/admin/trips/new"
-          className="flex items-center gap-2 bg-gold hover:bg-gold-dark text-primary font-semibold px-6 py-2.5 uppercase tracking-wider text-sm transition-colors"
+          className="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-2.5 uppercase tracking-wider text-sm transition-colors"
         >
           <Plus size={16} />
           New Trip

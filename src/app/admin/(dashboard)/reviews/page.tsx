@@ -32,7 +32,7 @@ export default async function AdminReviewsPage() {
                       <Star
                         key={i}
                         size={14}
-                        className="text-gold fill-gold"
+                        className="text-accent fill-accent"
                       />
                     ))}
                   </div>

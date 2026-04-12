@@ -52,7 +52,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="relative bg-primary text-white">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
+          className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{
             backgroundImage:
               "url('https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1920&q=80')",
@@ -66,7 +66,7 @@ export default function HomePage() {
             <br />
             Destinations
           </h1>
-          <p className="text-lg md:text-xl text-neutral-300 max-w-2xl mb-10 leading-relaxed">
+          <p className="text-lg md:text-xl text-green-200/80 max-w-2xl mb-10 leading-relaxed">
             Are you a discerning traveler seeking to explore and discover the
             world&apos;s most incredible destinations? Stop settling for plain
             uninspired vacations. Discover how our boutique travel experiences
@@ -75,7 +75,7 @@ export default function HomePage() {
           <div className="flex flex-wrap gap-4">
             <Link
               href="/trips"
-              className="bg-gold hover:bg-gold-dark text-primary font-semibold px-8 py-3 uppercase tracking-wider text-sm transition-colors"
+              className="bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-3 uppercase tracking-wider text-sm transition-colors"
             >
               View All Trips
             </Link>
@@ -99,7 +99,7 @@ export default function HomePage() {
             {features.map((feature) => (
               <div key={feature.title} className="flex gap-5">
                 <div className="shrink-0">
-                  <div className="w-12 h-12 bg-primary text-gold flex items-center justify-center">
+                  <div className="w-12 h-12 bg-primary text-accent-light flex items-center justify-center rounded-lg">
                     <feature.icon size={24} />
                   </div>
                 </div>
@@ -123,14 +123,14 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wider mb-6">
             Ready for Your Next Adventure?
           </h2>
-          <p className="text-neutral-400 mb-10 text-lg">
+          <p className="text-green-200/70 mb-10 text-lg">
             Fill out the registration form to reserve your spot on one of our
             upcoming trips. A deposit of $1,200 per traveler is required to
             secure your booking.
           </p>
           <Link
             href="/register"
-            className="inline-block bg-gold hover:bg-gold-dark text-primary font-semibold px-10 py-4 uppercase tracking-wider text-sm transition-colors"
+            className="inline-block bg-accent hover:bg-accent-dark text-white font-semibold px-10 py-4 uppercase tracking-wider text-sm transition-colors"
           >
             Register Now
           </Link>
@@ -138,7 +138,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 md:py-28 bg-neutral-50">
+      <section className="py-20 md:py-28 bg-green-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wider text-center mb-16">
             What Our Travelers Say
@@ -147,9 +147,9 @@ export default function HomePage() {
             {testimonials.map((t) => (
               <div
                 key={t.name}
-                className="bg-white p-8 border border-neutral-200"
+                className="bg-white p-8 border border-green-200 rounded-lg"
               >
-                <div className="flex gap-1 text-gold mb-4">
+                <div className="flex gap-1 text-accent mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={16} fill="currentColor" />
                   ))}

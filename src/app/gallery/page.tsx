@@ -26,7 +26,7 @@ export default async function GalleryPage() {
           <h1 className="text-4xl md:text-5xl font-bold uppercase tracking-wider">
             Gallery
           </h1>
-          <p className="text-neutral-400 mt-4 text-lg">
+          <p className="text-green-200/70 mt-4 text-lg">
             Moments captured from our tours around the world.
           </p>
         </div>

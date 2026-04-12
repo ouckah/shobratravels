@@ -20,7 +20,7 @@ export default async function AdminMessagesPage() {
             <div
               key={msg.id}
               className={`bg-white border p-6 ${
-                msg.read ? "border-neutral-200" : "border-gold"
+                msg.read ? "border-neutral-200" : "border-accent"
               }`}
             >
               <div className="flex items-start justify-between mb-3">
@@ -37,7 +37,7 @@ export default async function AdminMessagesPage() {
                     })}
                   </span>
                   {!msg.read && (
-                    <span className="px-2 py-0.5 text-xs bg-gold text-primary uppercase tracking-wider">
+                    <span className="px-2 py-0.5 text-xs bg-accent text-white uppercase tracking-wider">
                       New
                     </span>
                   )}

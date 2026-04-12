@@ -100,7 +100,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             required
             value={form.title}
             onChange={(e) => update("title", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
         <div className="sm:col-span-2">
@@ -109,7 +109,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             type="text"
             value={form.slug}
             onChange={(e) => update("slug", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
           rows={6}
           value={form.description}
           onChange={(e) => update("description", e.target.value)}
-          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold resize-none"
+          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent resize-none"
         />
       </div>
 
@@ -136,7 +136,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             placeholder="Istanbul, Bursa, Cappadocia"
             value={form.destinations}
             onChange={(e) => update("destinations", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -149,7 +149,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             placeholder="13 days"
             value={form.duration}
             onChange={(e) => update("duration", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -161,7 +161,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             required
             value={form.departureDate}
             onChange={(e) => update("departureDate", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -173,7 +173,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             required
             value={form.returnDate}
             onChange={(e) => update("returnDate", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -183,7 +183,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             placeholder="25-30 passengers"
             value={form.groupSize}
             onChange={(e) => update("groupSize", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -197,7 +197,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             step={0.01}
             value={form.pricePerPerson}
             onChange={(e) => update("pricePerPerson", parseFloat(e.target.value))}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -212,7 +212,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             onChange={(e) =>
               update("singleSupplement", parseFloat(e.target.value) || 0)
             }
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
       </div>
@@ -223,7 +223,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
           rows={3}
           value={form.inclusions}
           onChange={(e) => update("inclusions", e.target.value)}
-          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold resize-none"
+          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent resize-none"
         />
       </div>
 
@@ -233,7 +233,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
           rows={3}
           value={form.exclusions}
           onChange={(e) => update("exclusions", e.target.value)}
-          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold resize-none"
+          className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent resize-none"
         />
       </div>
 
@@ -246,7 +246,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             type="url"
             value={form.heroImage}
             onChange={(e) => update("heroImage", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
         <div>
@@ -257,7 +257,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
             type="url"
             value={form.pdfUrl}
             onChange={(e) => update("pdfUrl", e.target.value)}
-            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+            className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
           />
         </div>
       </div>
@@ -291,7 +291,7 @@ export default function TripForm({ trip }: { trip?: TripData }) {
         <button
           type="submit"
           disabled={saving}
-          className="bg-gold hover:bg-gold-dark text-primary font-semibold px-8 py-3 uppercase tracking-wider text-sm transition-colors disabled:opacity-50"
+          className="bg-accent hover:bg-accent-dark text-white font-semibold px-8 py-3 uppercase tracking-wider text-sm transition-colors disabled:opacity-50"
         >
           {saving ? "Saving..." : isEdit ? "Update Trip" : "Create Trip"}
         </button>

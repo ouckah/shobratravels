@@ -23,7 +23,7 @@ export default async function TripsPage() {
           <h1 className="text-4xl md:text-5xl font-bold uppercase tracking-wider">
             Upcoming Trips
           </h1>
-          <p className="text-neutral-400 mt-4 text-lg">
+          <p className="text-green-200/70 mt-4 text-lg">
             Explore our curated collection of cultural and historical boutique
             tours.
           </p>
@@ -44,7 +44,7 @@ export default async function TripsPage() {
                 <Link
                   key={trip.id}
                   href={`/trips/${trip.slug}`}
-                  className="group border border-neutral-200 hover:border-gold transition-colors"
+                  className="group border border-neutral-200 hover:border-accent transition-colors"
                 >
                   {trip.heroImage && (
                     <div className="aspect-[16/9] overflow-hidden">
@@ -56,7 +56,7 @@ export default async function TripsPage() {
                     </div>
                   )}
                   <div className="p-6">
-                    <h2 className="text-xl font-bold uppercase tracking-wider mb-3 group-hover:text-gold transition-colors">
+                    <h2 className="text-xl font-bold uppercase tracking-wider mb-3 group-hover:text-accent transition-colors">
                       {trip.title}
                     </h2>
                     <div className="flex flex-wrap gap-4 text-sm text-neutral-500 mb-4">

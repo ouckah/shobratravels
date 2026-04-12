@@ -30,7 +30,7 @@ export default function ContactPage() {
           <h1 className="text-4xl md:text-5xl font-bold uppercase tracking-wider">
             Get in Touch
           </h1>
-          <p className="text-neutral-400 mt-4 text-lg">
+          <p className="text-green-200/70 mt-4 text-lg">
             We would be glad to answer your inquiries regarding our upcoming
             trips.
           </p>
@@ -46,7 +46,7 @@ export default function ContactPage() {
               </h2>
               <div className="flex flex-col gap-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary text-gold flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 bg-primary text-accent-light flex items-center justify-center shrink-0">
                     <MapPin size={20} />
                   </div>
                   <div>
@@ -59,28 +59,28 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary text-gold flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 bg-primary text-accent-light flex items-center justify-center shrink-0">
                     <Phone size={20} />
                   </div>
                   <div>
                     <p className="font-medium">Phone</p>
                     <a
                       href="tel:2016182629"
-                      className="text-neutral-600 hover:text-gold transition-colors"
+                      className="text-neutral-600 hover:text-accent-light transition-colors"
                     >
                       (201) 618-2629
                     </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-primary text-gold flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 bg-primary text-accent-light flex items-center justify-center shrink-0">
                     <Mail size={20} />
                   </div>
                   <div>
                     <p className="font-medium">Email</p>
                     <a
                       href="mailto:shobratravels@gmail.com"
-                      className="text-neutral-600 hover:text-gold transition-colors"
+                      className="text-neutral-600 hover:text-accent-light transition-colors"
                     >
                       shobratravels@gmail.com
                     </a>
@@ -113,7 +113,7 @@ export default function ContactPage() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, name: e.target.value }))
                       }
-                      className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                      className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                     />
                   </div>
                   <div>
@@ -127,7 +127,7 @@ export default function ContactPage() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, email: e.target.value }))
                       }
-                      className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                      className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                     />
                   </div>
                   <div>
@@ -141,13 +141,13 @@ export default function ContactPage() {
                       onChange={(e) =>
                         setForm((f) => ({ ...f, message: e.target.value }))
                       }
-                      className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold resize-none"
+                      className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent resize-none"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="bg-gold hover:bg-gold-dark text-primary font-semibold py-3 uppercase tracking-wider text-sm transition-colors disabled:opacity-50"
+                    className="bg-accent hover:bg-accent-dark text-white font-semibold py-3 uppercase tracking-wider text-sm transition-colors disabled:opacity-50"
                   >
                     {submitting ? "Sending..." : "Contact Us"}
                   </button>

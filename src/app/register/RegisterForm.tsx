@@ -119,7 +119,7 @@ export default function RegisterForm() {
                   required
                   value={form.fullName}
                   onChange={(e) => update("fullName", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
               <div>
@@ -131,7 +131,7 @@ export default function RegisterForm() {
                   required
                   value={form.email}
                   onChange={(e) => update("email", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
               <div>
@@ -143,7 +143,7 @@ export default function RegisterForm() {
                   required
                   value={form.phone}
                   onChange={(e) => update("phone", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -155,7 +155,7 @@ export default function RegisterForm() {
                   required
                   value={form.address}
                   onChange={(e) => update("address", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
@@ -172,7 +172,7 @@ export default function RegisterForm() {
               required
               value={form.tripId}
               onChange={(e) => update("tripId", e.target.value)}
-              className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold bg-white"
+              className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent bg-white"
             >
               <option value="">Choose a trip...</option>
               {trips.map((trip) => (
@@ -197,7 +197,7 @@ export default function RegisterForm() {
                   required
                   value={form.passportNumber}
                   onChange={(e) => update("passportNumber", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
               <div>
@@ -209,7 +209,7 @@ export default function RegisterForm() {
                   required
                   value={form.passportCountry}
                   onChange={(e) => update("passportCountry", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
               <div>
@@ -221,7 +221,7 @@ export default function RegisterForm() {
                   required
                   value={form.passportIssued}
                   onChange={(e) => update("passportIssued", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
               <div>
@@ -233,7 +233,7 @@ export default function RegisterForm() {
                   required
                   value={form.passportExpiry}
                   onChange={(e) => update("passportExpiry", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
               <div className="sm:col-span-2">
@@ -245,7 +245,7 @@ export default function RegisterForm() {
                   required
                   value={form.passportIssuedBy}
                   onChange={(e) => update("passportIssuedBy", e.target.value)}
-                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-gold"
+                  className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent"
                 />
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function RegisterForm() {
               upon registration.
             </p>
             <div className="flex flex-col gap-3">
-              <label className="flex items-start gap-3 p-4 border border-neutral-300 cursor-pointer has-[:checked]:border-gold">
+              <label className="flex items-start gap-3 p-4 border border-neutral-300 cursor-pointer has-[:checked]:border-accent">
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -277,7 +277,7 @@ export default function RegisterForm() {
                   </p>
                 </div>
               </label>
-              <label className="flex items-start gap-3 p-4 border border-neutral-300 cursor-pointer has-[:checked]:border-gold">
+              <label className="flex items-start gap-3 p-4 border border-neutral-300 cursor-pointer has-[:checked]:border-accent">
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -294,7 +294,7 @@ export default function RegisterForm() {
                   </p>
                 </div>
               </label>
-              <label className="flex items-start gap-3 p-4 border border-neutral-300 cursor-pointer has-[:checked]:border-gold">
+              <label className="flex items-start gap-3 p-4 border border-neutral-300 cursor-pointer has-[:checked]:border-accent">
                 <input
                   type="radio"
                   name="paymentMethod"
@@ -323,7 +323,7 @@ export default function RegisterForm() {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-gold hover:bg-gold-dark text-primary font-semibold py-3 uppercase tracking-wider text-sm transition-colors disabled:opacity-50"
+            className="bg-accent hover:bg-accent-dark text-white font-semibold py-3 uppercase tracking-wider text-sm transition-colors disabled:opacity-50"
           >
             {submitting ? "Submitting..." : "Submit Registration"}
           </button>

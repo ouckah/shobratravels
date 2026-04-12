@@ -72,7 +72,7 @@ export default async function AdminDashboardPage() {
           <Link
             key={stat.label}
             href={stat.href}
-            className="bg-white p-6 border border-neutral-200 hover:border-gold transition-colors"
+            className="bg-white p-6 border border-neutral-200 hover:border-accent transition-colors"
           >
             <div className="flex items-center justify-between mb-3">
               <stat.icon size={20} className="text-neutral-400" />
@@ -105,7 +105,7 @@ export default async function AdminDashboardPage() {
           <div className="flex flex-col gap-3">
             <Link
               href="/admin/messages"
-              className="flex items-center justify-between text-sm hover:text-gold transition-colors"
+              className="flex items-center justify-between text-sm hover:text-accent transition-colors"
             >
               <span className="flex items-center gap-2">
                 <MessageSquare size={16} />
@@ -115,7 +115,7 @@ export default async function AdminDashboardPage() {
             </Link>
             <Link
               href="/admin/payments"
-              className="flex items-center justify-between text-sm hover:text-gold transition-colors"
+              className="flex items-center justify-between text-sm hover:text-accent transition-colors"
             >
               <span className="flex items-center gap-2">
                 <CreditCard size={16} />
@@ -125,7 +125,7 @@ export default async function AdminDashboardPage() {
             </Link>
             <Link
               href="/admin/reviews"
-              className="flex items-center justify-between text-sm hover:text-gold transition-colors"
+              className="flex items-center justify-between text-sm hover:text-accent transition-colors"
             >
               <span className="flex items-center gap-2">
                 <Users size={16} />
