@@ -22,19 +22,6 @@ export default async function TripDetailPage({ params }: Props) {
 
   if (!trip) notFound();
 
-  const tripData = {
-    id: trip.id,
-    title: trip.title,
-    slug: trip.slug,
-    pricePerPerson: trip.pricePerPerson,
-    singleSupplement: trip.singleSupplement,
-    dates: trip.dates.map((d) => ({
-      id: d.id,
-      departureDate: d.departureDate.toISOString(),
-      returnDate: d.returnDate.toISOString(),
-    })),
-  };
-
   return (
     <>
       {trip.heroImage && (
@@ -130,26 +117,15 @@ export default async function TripDetailPage({ params }: Props) {
                 )}
 
                 <div className="flex flex-col gap-3 text-sm mb-8">
-                  {trip.dates.map((d) => (
-                    <div
-                      key={d.id}
-                      className="flex items-center gap-2 text-neutral-600"
-                    >
+                  {trip.dates.length > 0 && (
+                    <div className="flex items-center gap-2 text-neutral-600">
                       <Calendar size={16} />
                       <span>
-                        {d.departureDate.toLocaleDateString("en-US", {
-                          month: "long",
-                          day: "numeric",
-                        })}{" "}
-                        –{" "}
-                        {d.returnDate.toLocaleDateString("en-US", {
-                          month: "long",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        {trip.dates.length}{" "}
+                        {trip.dates.length === 1 ? "date" : "dates"} available
                       </span>
                     </div>
-                  ))}
+                  )}
                   <div className="flex items-center gap-2 text-neutral-600">
                     <Clock size={16} />
                     <span>{trip.duration}</span>
@@ -178,7 +154,7 @@ export default async function TripDetailPage({ params }: Props) {
                   </a>
                 )}
 
-                <TripBooking trip={tripData} />
+                <TripBooking tripSlug={trip.slug} dateCount={trip.dates.length} />
               </div>
             </div>
           </div>
