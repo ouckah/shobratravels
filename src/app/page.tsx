@@ -124,9 +124,7 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {featuredTrips.map((trip) => {
-                const nextDate = trip.dates.find(
-                  (d) => d.departureDate >= new Date()
-                );
+                const nextDate = trip.dates[0];
                 return (
                   <Link
                     key={trip.id}
