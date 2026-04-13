@@ -75,7 +75,7 @@ export default async function HomePage() {
           <p className="text-accent-light text-sm uppercase tracking-[0.3em] mb-6">
             Cultural &bull; Historical &bull; Boutique
           </p>
-          <h1 className="text-5xl md:text-7xl font-bold uppercase tracking-wider mb-8 leading-[0.95]">
+          <h1 className="text-5xl md:text-7xl font-bold uppercase tracking-wider mb-8 leading-[1.1]">
             Discover the
             <br />
             World&apos;s Most
@@ -122,7 +122,7 @@ export default async function HomePage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {featuredTrips.map((trip) => {
                 const nextDate = trip.dates.find(
                   (d) => d.departureDate >= new Date()
@@ -198,7 +198,7 @@ export default async function HomePage() {
                 key={pillar.number}
                 className="group flex gap-6 items-start"
               >
-                <span className="text-5xl font-bold text-green-100 group-hover:text-accent transition-colors shrink-0 leading-none">
+                <span className="text-4xl md:text-5xl font-bold text-green-100 group-hover:text-accent transition-colors shrink-0 leading-none">
                   {pillar.number}
                 </span>
                 <div className="pt-1">

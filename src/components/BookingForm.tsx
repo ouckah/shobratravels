@@ -275,7 +275,7 @@ export default function BookingForm({
                 className="w-full border-b-2 border-neutral-200 px-0 py-2 bg-transparent focus:outline-none focus:border-accent transition-colors"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
                   Cell Phone
@@ -344,7 +344,7 @@ export default function BookingForm({
                             : "border-neutral-200 text-neutral-500 hover:border-neutral-300"
                         }`}
                       >
-                        Double
+                        <span className="whitespace-nowrap">Double</span>
                       </button>
                       <button
                         type="button"
@@ -355,7 +355,7 @@ export default function BookingForm({
                             : "border-neutral-200 text-neutral-500 hover:border-neutral-300"
                         }`}
                       >
-                        Single (+${singleSupplement.toLocaleString()})
+                        <span className="whitespace-nowrap">Single (+${singleSupplement.toLocaleString()})</span>
                       </button>
                     </div>
                   </div>
@@ -376,7 +376,7 @@ export default function BookingForm({
             Required for international travel.
           </p>
           <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
                   Passport Number
@@ -402,7 +402,7 @@ export default function BookingForm({
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
                   Date Issued

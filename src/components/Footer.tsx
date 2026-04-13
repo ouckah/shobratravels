@@ -70,7 +70,7 @@ export default function Footer() {
                 <Mail size={16} className="shrink-0 text-accent-light" />
                 <a
                   href="mailto:support@shobratravelagency.com"
-                  className="hover:text-accent-light transition-colors"
+                  className="hover:text-accent-light transition-colors break-all"
                 >
                   support@shobratravelagency.com
                 </a>

@@ -105,7 +105,7 @@ export default async function TripDetailPage({ params }: Props) {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="sticky top-24 bg-green-50 p-8 border border-neutral-200">
+              <div className="sticky top-24 bg-green-50 p-5 md:p-8 border border-neutral-200">
                 <p className="text-3xl font-bold mb-1">
                   ${trip.pricePerPerson.toLocaleString()}
                 </p>

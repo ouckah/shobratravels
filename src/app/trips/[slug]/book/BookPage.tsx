@@ -46,7 +46,7 @@ export default function BookPage({ trip }: { trip: Trip }) {
           <h1 className="text-3xl md:text-5xl font-bold uppercase tracking-wider">
             {trip.title}
           </h1>
-          <div className="flex flex-wrap gap-6 mt-6 text-sm text-green-200/60">
+          <div className="flex flex-wrap gap-3 md:gap-6 mt-6 text-sm text-green-200/60">
             <span className="flex items-center gap-1.5">
               <Clock size={14} />
               {trip.duration}

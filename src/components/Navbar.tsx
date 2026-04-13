@@ -29,7 +29,7 @@ export default function Navbar() {
               className="brightness-0 invert"
             />
             <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-wide uppercase">
+              <span className="text-lg md:text-xl font-bold tracking-wide uppercase">
                 Shobra Travel Agency
               </span>
               <span className="text-xs tracking-widest text-green-300 uppercase">
