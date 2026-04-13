@@ -10,17 +10,18 @@ const client = new SquareClient({
 });
 
 const LOCATION_ID = process.env.SQUARE_LOCATION_ID!;
-const CC_FEE_RATE = 0.039; // 3.9%
-const ACH_FEE_RATE = 0.01; // 1% — absorbed by business, not shown to customer
+const DEPOSIT_AMOUNT = 1200; // $1,200 deposit
+const CC_FEE_RATE = 0.039; // 3.9% — passed to customer
+const ACH_FEE_RATE = 0.01; // 1% — absorbed by business
 
-export function calculateTotal(method: string, tripPrice: number) {
+export function calculateDeposit(method: string) {
   if (method === "credit_card") {
-    const fee = Math.round(tripPrice * CC_FEE_RATE * 100) / 100;
-    return { base: tripPrice, fee, total: tripPrice + fee };
+    const fee = Math.round(DEPOSIT_AMOUNT * CC_FEE_RATE * 100) / 100;
+    return { base: DEPOSIT_AMOUNT, fee, total: DEPOSIT_AMOUNT + fee };
   }
-  // ACH — 1% absorbed by business
-  const fee = Math.round(tripPrice * ACH_FEE_RATE * 100) / 100;
-  return { base: tripPrice, fee, total: tripPrice };
+  // ACH — 1% absorbed, customer pays $1,200 flat
+  const fee = Math.round(DEPOSIT_AMOUNT * ACH_FEE_RATE * 100) / 100;
+  return { base: DEPOSIT_AMOUNT, fee, total: DEPOSIT_AMOUNT };
 }
 
 export async function processPayment(
@@ -29,13 +30,6 @@ export async function processPayment(
   buyerEmail: string,
   tripTitle: string
 ) {
-  console.log("Processing payment:", {
-    amountCents,
-    sourceIdPrefix: sourceId.substring(0, 20) + "...",
-    locationId: LOCATION_ID,
-    environment: process.env.SQUARE_ENVIRONMENT,
-  });
-
   const response = await client.payments.create({
     sourceId,
     idempotencyKey: crypto.randomUUID(),
@@ -45,7 +39,7 @@ export async function processPayment(
     },
     locationId: LOCATION_ID,
     buyerEmailAddress: buyerEmail,
-    note: `Shobra Travel Agency — ${tripTitle}`,
+    note: `Shobra Travel Agency — Deposit for ${tripTitle}`,
   });
 
   return response.payment;

@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Calendar, Users, MapPin, Clock, FileText } from "lucide-react";
 import { prisma } from "@/lib/db";
 import type { Metadata } from "next";
+import TripBooking from "./TripBooking";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -21,6 +21,19 @@ export default async function TripDetailPage({ params }: Props) {
   });
 
   if (!trip) notFound();
+
+  const tripData = {
+    id: trip.id,
+    title: trip.title,
+    slug: trip.slug,
+    pricePerPerson: trip.pricePerPerson,
+    singleSupplement: trip.singleSupplement,
+    dates: trip.dates.map((d) => ({
+      id: d.id,
+      departureDate: d.departureDate.toISOString(),
+      returnDate: d.returnDate.toISOString(),
+    })),
+  };
 
   return (
     <>
@@ -102,8 +115,11 @@ export default async function TripDetailPage({ params }: Props) {
                 <p className="text-3xl font-bold mb-1">
                   ${trip.pricePerPerson.toLocaleString()}
                 </p>
-                <p className="text-neutral-500 text-sm mb-6">
+                <p className="text-neutral-500 text-sm mb-1">
                   per person (double occupancy)
+                </p>
+                <p className="text-accent text-xs font-medium mb-6">
+                  $1,200 deposit &middot; balance due 90 days before travel
                 </p>
 
                 {trip.singleSupplement && (
@@ -115,7 +131,10 @@ export default async function TripDetailPage({ params }: Props) {
 
                 <div className="flex flex-col gap-3 text-sm mb-8">
                   {trip.dates.map((d) => (
-                    <div key={d.id} className="flex items-center gap-2 text-neutral-600">
+                    <div
+                      key={d.id}
+                      className="flex items-center gap-2 text-neutral-600"
+                    >
                       <Calendar size={16} />
                       <span>
                         {d.departureDate.toLocaleDateString("en-US", {
@@ -159,12 +178,7 @@ export default async function TripDetailPage({ params }: Props) {
                   </a>
                 )}
 
-                <Link
-                  href={`/register?trip=${trip.slug}`}
-                  className="block w-full bg-accent hover:bg-accent-dark text-white text-center font-semibold py-3 uppercase tracking-wider text-sm transition-colors"
-                >
-                  Register for This Trip
-                </Link>
+                <TripBooking trip={tripData} />
               </div>
             </div>
           </div>

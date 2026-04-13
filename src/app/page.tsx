@@ -92,10 +92,10 @@ export default function HomePage() {
               />
             </Link>
             <Link
-              href="/register"
+              href="/trips"
               className="border border-white/30 hover:bg-white hover:text-primary px-8 py-4 uppercase tracking-wider text-sm transition-colors"
             >
-              Register Now
+              Browse Trips
             </Link>
           </div>
         </div>
@@ -155,10 +155,10 @@ export default function HomePage() {
             </p>
           </div>
           <Link
-            href="/register"
+            href="/trips"
             className="group bg-accent hover:bg-accent-dark text-white font-semibold px-10 py-4 uppercase tracking-wider text-sm transition-colors inline-flex items-center gap-3 shrink-0"
           >
-            Register Now
+            Browse Trips
             <ArrowRight
               size={16}
               className="group-hover:translate-x-1 transition-transform"

@@ -36,7 +36,6 @@ export default function Footer() {
             <nav className="flex flex-col gap-2">
               {[
                 { href: "/trips", label: "Upcoming Trips" },
-                { href: "/register", label: "Register" },
                 { href: "/gallery", label: "Gallery" },
                 { href: "/reviews", label: "Reviews" },
                 { href: "/contact", label: "Contact Us" },

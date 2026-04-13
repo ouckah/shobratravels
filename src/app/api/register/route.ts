@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { processPayment, calculateTotal } from "@/lib/square";
+import { processPayment, calculateDeposit } from "@/lib/square";
 import { notifyNewRegistration, notifyPaymentReceived } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
@@ -69,8 +69,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Process payment FIRST — if this fails, no registration is created
-    const { base, fee, total } = calculateTotal(paymentMethod, trip.pricePerPerson);
+    // Process deposit payment FIRST — if this fails, no registration is created
+    const { base, fee, total } = calculateDeposit(paymentMethod);
     const amountCents = Math.round(total * 100);
     const squarePayment = await processPayment(sourceId, amountCents, email, trip.title);
 
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
         passportIssuedBy,
         passportImage: passportImage || null,
         paymentMethod,
-        status: "FULLY_PAID",
+        status: "DEPOSIT_PAID",
       },
     });
 
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
         registrationId: registration.id,
         amount: base,
         processingFee: fee,
-        type: "FINAL",
+        type: "DEPOSIT",
         status: "COMPLETED",
         method: paymentMethod,
         squarePaymentId: squarePayment?.id || null,
