@@ -7,6 +7,7 @@ import {
   CreditCard,
   MessageSquare,
   Star,
+  ImageIcon,
   LogOut,
 } from "lucide-react";
 import AdminLogout from "./AdminLogout";
@@ -14,6 +15,7 @@ import AdminLogout from "./AdminLogout";
 const sidebarLinks = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/trips", label: "Trips", icon: Map },
+  { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
   { href: "/admin/clients", label: "Clients", icon: Users },
   { href: "/admin/payments", label: "Payments", icon: CreditCard },
   { href: "/admin/messages", label: "Messages", icon: MessageSquare },
