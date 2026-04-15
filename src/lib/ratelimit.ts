@@ -2,10 +2,12 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextRequest } from "next/server";
 
-const hasUpstash =
-  !!process.env.UPSTASH_REDIS_REST_URL && !!process.env.UPSTASH_REDIS_REST_TOKEN;
+const url =
+  process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const token =
+  process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
-const redis = hasUpstash ? Redis.fromEnv() : null;
+const redis = url && token ? new Redis({ url, token }) : null;
 
 function makeLimiter(tokens: number, window: `${number} ${"s" | "m" | "h" | "d"}`) {
   if (!redis) return null;
