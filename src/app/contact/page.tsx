@@ -6,18 +6,27 @@ import { MapPin, Phone, Mail } from "lucide-react";
 export default function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError("");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (res.ok) setSubmitted(true);
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to send message. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -144,6 +153,11 @@ export default function ContactPage() {
                       className="w-full border border-neutral-300 px-4 py-2.5 focus:outline-none focus:border-accent resize-none"
                     />
                   </div>
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+                      {error}
+                    </div>
+                  )}
                   <button
                     type="submit"
                     disabled={submitting}

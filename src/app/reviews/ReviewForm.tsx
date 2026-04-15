@@ -6,6 +6,7 @@ import { Star, Check } from "lucide-react";
 export default function ReviewForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
   const [form, setForm] = useState({ name: "", content: "" });
@@ -13,13 +14,21 @@ export default function ReviewForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError("");
     try {
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, rating }),
       });
-      if (res.ok) setSubmitted(true);
+      if (res.ok) {
+        setSubmitted(true);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to submit. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -94,6 +103,11 @@ export default function ReviewForm() {
           className="w-full border-2 border-neutral-200 px-4 py-3 bg-transparent focus:outline-none focus:border-accent transition-colors resize-none"
         />
       </div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+          {error}
+        </div>
+      )}
       <button
         type="submit"
         disabled={submitting}

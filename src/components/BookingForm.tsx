@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import SquarePayment from "@/components/SquarePayment";
 import { COUNTRIES } from "@/lib/countries";
+import { formatPhoneAsYouType, isValidPhone } from "@/lib/phone";
 
 const DEPOSIT = 1200;
 const CC_FEE_RATE = 0.039;
@@ -102,16 +103,29 @@ export default function BookingForm({
 
   const canAdvance = () => {
     if (step === 0)
-      return form.fullName && form.email && form.cellPhone && form.address;
-    if (step === 1)
+      return (
+        form.fullName &&
+        form.email &&
+        form.cellPhone &&
+        isValidPhone(form.cellPhone) &&
+        (!form.homePhone || isValidPhone(form.homePhone)) &&
+        form.address
+      );
+    if (step === 1) {
+      const expiryValid =
+        form.passportIssued &&
+        form.passportExpiry &&
+        Date.parse(form.passportExpiry) > Date.parse(form.passportIssued);
       return (
         form.passportNumber &&
         form.passportCountry &&
         form.passportIssued &&
         form.passportExpiry &&
+        expiryValid &&
         form.passportIssuedBy &&
         form.passportImage
       );
+    }
     return true;
   };
 
@@ -285,10 +299,17 @@ export default function BookingForm({
                   type="tel"
                   required
                   value={form.cellPhone}
-                  onChange={(e) => update("cellPhone", e.target.value)}
+                  onChange={(e) => update("cellPhone", formatPhoneAsYouType(e.target.value))}
                   placeholder="(555) 123-4567"
-                  className="w-full border-b-2 border-neutral-200 px-0 py-2 bg-transparent focus:outline-none focus:border-accent transition-colors"
+                  className={`w-full border-b-2 px-0 py-2 bg-transparent focus:outline-none transition-colors ${
+                    form.cellPhone && !isValidPhone(form.cellPhone)
+                      ? "border-red-300 focus:border-red-500"
+                      : "border-neutral-200 focus:border-accent"
+                  }`}
                 />
+                {form.cellPhone && !isValidPhone(form.cellPhone) && (
+                  <p className="text-red-500 text-[11px] mt-1">Enter a valid phone number</p>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-1">
@@ -300,9 +321,16 @@ export default function BookingForm({
                 <input
                   type="tel"
                   value={form.homePhone}
-                  onChange={(e) => update("homePhone", e.target.value)}
-                  className="w-full border-b-2 border-neutral-200 px-0 py-2 bg-transparent focus:outline-none focus:border-accent transition-colors"
+                  onChange={(e) => update("homePhone", formatPhoneAsYouType(e.target.value))}
+                  className={`w-full border-b-2 px-0 py-2 bg-transparent focus:outline-none transition-colors ${
+                    form.homePhone && !isValidPhone(form.homePhone)
+                      ? "border-red-300 focus:border-red-500"
+                      : "border-neutral-200 focus:border-accent"
+                  }`}
                 />
+                {form.homePhone && !isValidPhone(form.homePhone) && (
+                  <p className="text-red-500 text-[11px] mt-1">Enter a valid phone number</p>
+                )}
               </div>
             </div>
             <div>
@@ -433,8 +461,19 @@ export default function BookingForm({
                   required
                   value={form.passportExpiry}
                   onChange={(e) => update("passportExpiry", e.target.value)}
-                  className="w-full border-b-2 border-neutral-200 px-0 py-2 bg-transparent focus:outline-none focus:border-accent transition-colors"
+                  className={`w-full border-b-2 px-0 py-2 bg-transparent focus:outline-none transition-colors ${
+                    form.passportIssued &&
+                    form.passportExpiry &&
+                    Date.parse(form.passportExpiry) <= Date.parse(form.passportIssued)
+                      ? "border-red-300 focus:border-red-500"
+                      : "border-neutral-200 focus:border-accent"
+                  }`}
                 />
+                {form.passportIssued &&
+                  form.passportExpiry &&
+                  Date.parse(form.passportExpiry) <= Date.parse(form.passportIssued) && (
+                    <p className="text-red-500 text-[11px] mt-1">Expiry must be after issue date</p>
+                  )}
               </div>
             </div>
             <div>
