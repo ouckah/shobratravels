@@ -16,6 +16,7 @@ import {
   Info,
 } from "lucide-react";
 import SquarePayment from "@/components/SquarePayment";
+import { COUNTRIES } from "@/lib/countries";
 
 const DEPOSIT = 1200;
 const CC_FEE_RATE = 0.039;
@@ -396,10 +397,18 @@ export default function BookingForm({
                 <input
                   type="text"
                   required
+                  list="passport-country-list"
+                  autoComplete="country-name"
+                  placeholder="Start typing…"
                   value={form.passportCountry}
                   onChange={(e) => update("passportCountry", e.target.value)}
                   className="w-full border-b-2 border-neutral-200 px-0 py-2 bg-transparent focus:outline-none focus:border-accent transition-colors"
                 />
+                <datalist id="passport-country-list">
+                  {COUNTRIES.map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

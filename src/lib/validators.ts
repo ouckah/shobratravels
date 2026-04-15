@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { COUNTRY_SET } from "./countries";
 
 const name = z.string().trim().min(1).max(120);
 const email = z.string().trim().toLowerCase().email().max(200);
@@ -32,7 +33,12 @@ export const registerSchema = z
     tripId: z.string().min(1).max(50),
     tripDateId: z.string().min(1).max(50),
     passportNumber: z.string().trim().min(3).max(40),
-    passportCountry: z.string().trim().min(2).max(100),
+    passportCountry: z
+      .string()
+      .trim()
+      .min(2)
+      .max(100)
+      .refine((v) => COUNTRY_SET.has(v), { message: "Select a country from the list" }),
     passportIssued: isoDate,
     passportExpiry: isoDate,
     passportIssuedBy: z.string().trim().min(1).max(120),
