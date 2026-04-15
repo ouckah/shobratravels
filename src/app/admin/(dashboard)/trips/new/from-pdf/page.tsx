@@ -22,6 +22,7 @@ export default function NewTripFromPdfPage() {
   const [status, setStatus] = useState<"idle" | "parsing" | "ready" | "error">("idle");
   const [error, setError] = useState("");
   const [extracted, setExtracted] = useState<Extracted | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const onFile = async (f: File) => {
@@ -29,15 +30,24 @@ export default function NewTripFromPdfPage() {
     setStatus("parsing");
     setError("");
     try {
-      const fd = new FormData();
-      fd.append("file", f);
-      const res = await fetch("/api/admin/trips/parse-pdf", { method: "POST", body: fd });
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}));
+      const parseFd = new FormData();
+      parseFd.append("file", f);
+      const uploadFd = new FormData();
+      uploadFd.append("file", f);
+      const [parseRes, uploadRes] = await Promise.all([
+        fetch("/api/admin/trips/parse-pdf", { method: "POST", body: parseFd }),
+        fetch("/api/admin/upload", { method: "POST", body: uploadFd }),
+      ]);
+      if (!parseRes.ok) {
+        const d = await parseRes.json().catch(() => ({}));
         throw new Error(d.error || "Parse failed");
       }
-      const data = (await res.json()) as Extracted;
+      const data = (await parseRes.json()) as Extracted;
       setExtracted(data);
+      if (uploadRes.ok) {
+        const { url } = await uploadRes.json();
+        setPdfUrl(url);
+      }
       setStatus("ready");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Parse failed");
@@ -48,6 +58,7 @@ export default function NewTripFromPdfPage() {
   const reset = () => {
     setFile(null);
     setExtracted(null);
+    setPdfUrl("");
     setStatus("idle");
     setError("");
     if (inputRef.current) inputRef.current.value = "";
@@ -70,7 +81,7 @@ export default function NewTripFromPdfPage() {
       inclusions: extracted.inclusions || "",
       exclusions: extracted.exclusions || "",
       heroImage: "",
-      pdfUrl: "",
+      pdfUrl: pdfUrl,
       published: false,
       featured: false,
     };
