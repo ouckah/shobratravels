@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 
 const SESSION_COOKIE = "admin_session";
+const SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 7; // 7 days
 
 export async function login(email: string, password: string) {
   const admin = await prisma.adminUser.findUnique({ where: { email } });
@@ -15,9 +16,10 @@ export async function login(email: string, password: string) {
   const token = Buffer.from(`${admin.id}:${Date.now()}`).toString("base64");
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV !== "development",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 days (604800 seconds)
+    maxAge: SESSION_MAX_AGE_SEC,
+    path: "/",
   });
 
   return admin;
@@ -30,7 +32,14 @@ export async function getSession() {
 
   try {
     const decoded = Buffer.from(token, "base64").toString();
-    const [adminId] = decoded.split(":");
+    const [adminId, issuedAtStr] = decoded.split(":");
+    if (!adminId || !issuedAtStr) return null;
+
+    const issuedAt = Number(issuedAtStr);
+    if (!Number.isFinite(issuedAt)) return null;
+    const ageMs = Date.now() - issuedAt;
+    if (ageMs < 0 || ageMs > SESSION_MAX_AGE_SEC * 1000) return null;
+
     const admin = await prisma.adminUser.findUnique({
       where: { id: adminId },
       select: { id: true, email: true, name: true },

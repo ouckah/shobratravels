@@ -1,17 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { notifyNewReview } from "@/lib/email";
+import { checkLimit, getClientIp, limiters } from "@/lib/ratelimit";
+import { reviewSchema, formatZodError } from "@/lib/validators";
 
 export async function POST(req: NextRequest) {
-  try {
-    const { name, content, rating } = await req.json();
+  const limit = await checkLimit(limiters.review, `review:${getClientIp(req)}`);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Too many reviews submitted. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSec) } },
+    );
+  }
 
-    if (!name || !content) {
-      return NextResponse.json(
-        { error: "Name and review are required" },
-        { status: 400 }
-      );
+  try {
+    const body = await req.json();
+    const parsed = reviewSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     }
+    const { name, content } = parsed.data;
+    const rating = parsed.data.rating ?? 5;
 
     const client = await prisma.client.findFirst({
       where: {
@@ -23,16 +32,15 @@ export async function POST(req: NextRequest) {
       data: {
         name,
         content,
-        rating: Math.min(5, Math.max(1, rating || 5)),
+        rating,
         clientId: client?.id || null,
         approved: false,
       },
     });
 
-    const clampedRating = Math.min(5, Math.max(1, rating || 5));
     notifyNewReview({
       reviewerName: name,
-      rating: clampedRating,
+      rating,
       content,
     }).catch(console.error);
 
@@ -40,7 +48,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Failed to submit review" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

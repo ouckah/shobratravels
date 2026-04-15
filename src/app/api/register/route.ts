@@ -2,10 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { processPayment, calculateDeposit } from "@/lib/square";
 import { notifyNewRegistration, notifyPaymentReceived } from "@/lib/email";
+import { checkLimit, getClientIp, limiters } from "@/lib/ratelimit";
+import { registerSchema, formatZodError } from "@/lib/validators";
 
 export async function POST(req: NextRequest) {
+  const limit = await checkLimit(limiters.register, `register:${getClientIp(req)}`);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Too many registration attempts. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSec) } },
+    );
+  }
+
   try {
     const body = await req.json();
+    const parsed = registerSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
+    }
 
     const {
       fullName,
@@ -23,21 +37,7 @@ export async function POST(req: NextRequest) {
       passportImage,
       paymentMethod,
       sourceId,
-    } = body;
-
-    if (!fullName || !email || !cellPhone || !address || !tripId || !tripDateId || !passportNumber) {
-      return NextResponse.json(
-        { error: "All required fields must be filled" },
-        { status: 400 }
-      );
-    }
-
-    if (!sourceId) {
-      return NextResponse.json(
-        { error: "Payment information is required" },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const trip = await prisma.trip.findUnique({
       where: { id: tripId },

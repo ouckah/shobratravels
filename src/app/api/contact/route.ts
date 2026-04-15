@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { checkLimit, getClientIp, limiters } from "@/lib/ratelimit";
+import { contactSchema, formatZodError } from "@/lib/validators";
 
 export async function POST(req: NextRequest) {
-  try {
-    const { name, email, message } = await req.json();
+  const limit = await checkLimit(limiters.contact, `contact:${getClientIp(req)}`);
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSec) } },
+    );
+  }
 
-    if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: "All fields are required" },
-        { status: 400 }
-      );
+  try {
+    const body = await req.json();
+    const parsed = contactSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     }
+    const { name, email, message } = parsed.data;
 
     const client = await prisma.client.findUnique({ where: { email } });
 
@@ -27,7 +35,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Failed to send message" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
