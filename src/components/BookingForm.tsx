@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import SquarePayment from "@/components/SquarePayment";
 import { COUNTRIES } from "@/lib/countries";
-import { formatPhoneAsYouType, isValidPhone } from "@/lib/phone";
+import { formatPhoneInput, isValidPhone } from "@/lib/phone";
 
 const DEPOSIT = 1200;
 const CC_FEE_RATE = 0.039;
@@ -299,7 +299,7 @@ export default function BookingForm({
                   type="tel"
                   required
                   value={form.cellPhone}
-                  onChange={(e) => update("cellPhone", formatPhoneAsYouType(e.target.value))}
+                  onChange={(e) => update("cellPhone", formatPhoneInput(e.target.value, form.cellPhone))}
                   placeholder="(555) 123-4567"
                   className={`w-full border-b-2 px-0 py-2 bg-transparent focus:outline-none transition-colors ${
                     form.cellPhone && !isValidPhone(form.cellPhone)
@@ -321,7 +321,7 @@ export default function BookingForm({
                 <input
                   type="tel"
                   value={form.homePhone}
-                  onChange={(e) => update("homePhone", formatPhoneAsYouType(e.target.value))}
+                  onChange={(e) => update("homePhone", formatPhoneInput(e.target.value, form.homePhone))}
                   className={`w-full border-b-2 px-0 py-2 bg-transparent focus:outline-none transition-colors ${
                     form.homePhone && !isValidPhone(form.homePhone)
                       ? "border-red-300 focus:border-red-500"
