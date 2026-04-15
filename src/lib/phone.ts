@@ -16,10 +16,21 @@ export function formatPhoneAsYouType(raw: string): string {
   return new AsYouType(DEFAULT_REGION).input(raw);
 }
 
-// Format only on forward-typing. When the user is deleting (shorter value)
-// pass the raw input through so backspacing a formatting char doesn't get
-// undone by re-applying the formatter.
+// Digit-based input handling: the user effectively types/deletes only digits.
+// If the keystroke deleted a format char (digit count unchanged but value
+// shortened), we drop a digit for them so backspace feels natural.
 export function formatPhoneInput(next: string, prev: string): string {
-  if (next.length < prev.length) return next;
-  return formatPhoneAsYouType(next);
+  const nextDigits = next.replace(/\D/g, "");
+  const prevDigits = prev.replace(/\D/g, "");
+
+  let digits: string;
+  if (next.length < prev.length && nextDigits.length === prevDigits.length) {
+    // Backspace/delete landed on a format char — drop the preceding digit.
+    digits = prevDigits.slice(0, -1);
+  } else {
+    digits = nextDigits;
+  }
+
+  if (!digits) return "";
+  return formatPhoneAsYouType(digits);
 }
