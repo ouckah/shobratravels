@@ -27,7 +27,9 @@ async function main() {
   const departure = new Date("2026-10-12");
   const returnDate = new Date("2026-10-22");
 
-  console.log("1/10 sendClientConfirmation (deposit receipt)...");
+  const demoBalanceLink = "https://square.link/u/TESTdemoBALANCE";
+
+  console.log("1/10 sendClientConfirmation (deposit receipt + balance link)...");
   await sendClientConfirmation({
     clientName: "Amira Shobra",
     clientEmail: TEST_TO,
@@ -40,6 +42,8 @@ async function main() {
     paymentMethod: "credit_card",
     squarePaymentId: "TEST_PAYMENT_ABC123XYZ",
     paidAt: new Date(),
+    balanceAmount: 4800,
+    balancePaymentLinkUrl: demoBalanceLink,
   });
 
   console.log("2/10 notifyNewRegistration (admin)...");
@@ -113,6 +117,7 @@ async function main() {
     balanceDue: 4800,
     paymentDueDate,
     daysUntilDue: 7,
+    balancePaymentLinkUrl: demoBalanceLink,
   });
 
   console.log("10/10 sendFinalPaymentReceipt (client)...");

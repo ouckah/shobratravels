@@ -235,6 +235,8 @@ export async function sendClientConfirmation(data: {
   paymentMethod: string;
   squarePaymentId: string | null;
   paidAt: Date;
+  balanceAmount?: number;
+  balancePaymentLinkUrl?: string | null;
 }) {
   const methodLabel =
     data.paymentMethod === "credit_card"
@@ -291,12 +293,30 @@ export async function sendClientConfirmation(data: {
     </div>
   `;
 
+  const balanceCard =
+    data.balanceAmount && data.balanceAmount > 0
+      ? `
+    <div style="background:#ffffff;border:1px solid ${BRAND.divider};border-top:4px solid ${BRAND.green800};padding:18px 22px;margin:0 0 16px;">
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${BRAND.muted};font-weight:700;">Remaining balance</div>
+      <div style="font-size:24px;font-weight:700;color:${BRAND.green800};margin-top:4px;">${fmtMoney(data.balanceAmount)}</div>
+      <div style="font-size:13px;color:${BRAND.body};margin-top:6px;line-height:1.5;">
+        Due no later than three months before departure. We'll send a reminder one week before the deadline.
+      </div>
+      ${
+        data.balancePaymentLinkUrl
+          ? `<div style="margin-top:14px;"><a href="${data.balancePaymentLinkUrl}" style="display:inline-block;background:${BRAND.green700};color:#ffffff;text-decoration:none;padding:12px 24px;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:700;border-radius:2px;">Pay balance now</a><div style="font-size:12px;color:${BRAND.muted};margin-top:8px;">You can come back to this link any time before the deadline.</div></div>`
+          : ""
+      }
+    </div>
+  `
+      : "";
+
   const nextSteps = `
     <div style="background:${BRAND.green50};border-left:3px solid ${BRAND.green600};padding:16px 20px;margin:16px 0 8px;">
       <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${BRAND.green800};font-weight:700;margin-bottom:8px;">What happens next</div>
       <ol style="margin:0;padding-left:18px;color:${BRAND.body};font-size:14px;line-height:1.7;">
         <li>Your spot on this trip is officially reserved.</li>
-        <li>We'll send a balance-due reminder as departure approaches.</li>
+        <li>Pay the remaining balance any time before three months out${data.balancePaymentLinkUrl ? " using the link above" : ""}.</li>
         <li>Pre-trip updates, documents, and itinerary details will arrive by email.</li>
       </ol>
     </div>
@@ -307,7 +327,7 @@ export async function sendClientConfirmation(data: {
     accentLabel: "Booking confirmed · Receipt",
     heading: `Thank you, ${data.clientName}!`,
     intro: `We've received your registration and deposit for <strong>${data.tripTitle}</strong>. This email is both your receipt and your booking confirmation — we're thrilled to have you with us.`,
-    bodyHtml: receipt + nextSteps,
+    bodyHtml: receipt + balanceCard + nextSteps,
     footerNote: `Have a question about your booking? Just reply to this email — it goes straight to us.`,
   });
 
@@ -512,6 +532,7 @@ export async function sendBalanceDueReminder(data: {
   balanceDue: number;
   paymentDueDate: Date;
   daysUntilDue: number;
+  balancePaymentLinkUrl?: string | null;
 }) {
   const daysLabel =
     data.daysUntilDue === 1 ? "1 day" : `${data.daysUntilDue} days`;
@@ -530,12 +551,25 @@ export async function sendBalanceDueReminder(data: {
         <div style="font-size:13px;color:${BRAND.muted};margin-top:2px;">That's ${daysLabel} from today.</div>
       </div>
     </div>
+    ${
+      data.balancePaymentLinkUrl
+        ? `
+    <div style="margin:20px 0 4px;text-align:center;">
+      <a href="${data.balancePaymentLinkUrl}" style="display:inline-block;background:${BRAND.green700};color:#ffffff;text-decoration:none;padding:14px 32px;font-size:14px;letter-spacing:1px;text-transform:uppercase;font-weight:700;border-radius:2px;">Pay balance now</a>
+    </div>
+    <p style="margin:12px 0 0;color:${BRAND.muted};font-size:13px;line-height:1.5;text-align:center;">
+      Secure checkout hosted by Square. Card or bank transfer accepted.
+    </p>`
+        : ""
+    }
     <p style="margin:18px 0 0;color:${BRAND.body};font-size:15px;line-height:1.6;">
       We close out bookings three months before departure, so the final payment needs to land by <strong>${fmtDate(data.paymentDueDate)}</strong> to keep your spot on this trip.
     </p>
-    <p style="margin:12px 0 0;color:${BRAND.body};font-size:15px;line-height:1.6;">
-      Simply reply to this email and we'll send you a secure payment link (or provide ACH / check instructions, whichever works best for you).
-    </p>
+    ${
+      data.balancePaymentLinkUrl
+        ? ""
+        : `<p style="margin:12px 0 0;color:${BRAND.body};font-size:15px;line-height:1.6;">Simply reply to this email and we'll send you a secure payment link (or provide ACH / check instructions, whichever works best for you).</p>`
+    }
   `;
 
   await resend.emails.send({

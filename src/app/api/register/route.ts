@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { processPayment, calculateDeposit } from "@/lib/square";
+import { processPayment, calculateDeposit, createBalancePaymentLink } from "@/lib/square";
 import { notifyNewRegistration, notifyPaymentReceived, sendClientConfirmation } from "@/lib/email";
 import { checkLimit, getClientIp, limiters } from "@/lib/ratelimit";
 import { registerSchema, formatZodError } from "@/lib/validators";
@@ -116,6 +116,35 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Best-effort: generate a Square-hosted balance payment link. If this
+    // fails, registration still succeeds — the cron can regenerate later.
+    const balanceAmount = trip.pricePerPerson - base;
+    let balancePaymentLinkUrl: string | null = null;
+    if (balanceAmount > 0) {
+      try {
+        const link = await createBalancePaymentLink({
+          registrationId: registration.id,
+          clientName: fullName,
+          clientEmail: email,
+          tripTitle: trip.title,
+          balanceAmount,
+        });
+        if (link) {
+          balancePaymentLinkUrl = link.url;
+          await prisma.registration.update({
+            where: { id: registration.id },
+            data: {
+              balancePaymentLinkUrl: link.url,
+              balancePaymentLinkId: link.id,
+              balancePaymentOrderId: link.orderId,
+            },
+          });
+        }
+      } catch (err) {
+        console.error("Failed to create balance payment link:", err);
+      }
+    }
+
     notifyNewRegistration({
       clientName: fullName,
       clientEmail: email,
@@ -145,6 +174,8 @@ export async function POST(req: NextRequest) {
       paymentMethod,
       squarePaymentId: squarePayment?.id || null,
       paidAt: new Date(),
+      balanceAmount,
+      balancePaymentLinkUrl,
     }).catch(console.error);
 
     return NextResponse.json({

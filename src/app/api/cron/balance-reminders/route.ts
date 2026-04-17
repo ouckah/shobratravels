@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendBalanceDueReminder } from "@/lib/email";
+import { createBalancePaymentLink } from "@/lib/square";
 
 // Shobra closes purchases 3 months before departure — that's the final
 // payment deadline. Fire a reminder 1 week before the deadline.
@@ -84,6 +85,34 @@ export async function GET(req: NextRequest) {
         (paymentDueDate.getTime() - now.getTime()) / 86_400_000,
       );
 
+      // Lazy-regenerate the payment link if it's missing (e.g. Square was
+      // down at registration time) or the stored balance no longer matches.
+      let balancePaymentLinkUrl = reg.balancePaymentLinkUrl;
+      if (!balancePaymentLinkUrl) {
+        try {
+          const link = await createBalancePaymentLink({
+            registrationId: reg.id,
+            clientName: reg.client.fullName,
+            clientEmail: reg.client.email,
+            tripTitle: reg.trip.title,
+            balanceAmount: balanceDue,
+          });
+          if (link) {
+            balancePaymentLinkUrl = link.url;
+            await prisma.registration.update({
+              where: { id: reg.id },
+              data: {
+                balancePaymentLinkUrl: link.url,
+                balancePaymentLinkId: link.id,
+                balancePaymentOrderId: link.orderId,
+              },
+            });
+          }
+        } catch (err) {
+          console.error(`Failed to backfill payment link for ${reg.id}:`, err);
+        }
+      }
+
       await sendBalanceDueReminder({
         clientName: reg.client.fullName,
         clientEmail: reg.client.email,
@@ -93,6 +122,7 @@ export async function GET(req: NextRequest) {
         balanceDue,
         paymentDueDate,
         daysUntilDue,
+        balancePaymentLinkUrl,
       });
 
       await prisma.registration.update({
