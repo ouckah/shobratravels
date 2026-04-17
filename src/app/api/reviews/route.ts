@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { notifyNewReview } from "@/lib/email";
+import { notifyNewReview, sendReviewReceived } from "@/lib/email";
 import { checkLimit, getClientIp, limiters } from "@/lib/ratelimit";
 import { reviewSchema, formatZodError } from "@/lib/validators";
 
@@ -19,18 +19,19 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
     }
-    const { name, content } = parsed.data;
+    const { name, content, email } = parsed.data;
     const rating = parsed.data.rating ?? 5;
 
     const client = await prisma.client.findFirst({
-      where: {
-        fullName: { contains: name, mode: "insensitive" },
-      },
+      where: email
+        ? { email }
+        : { fullName: { contains: name, mode: "insensitive" } },
     });
 
     await prisma.review.create({
       data: {
         name,
+        email: email ?? null,
         content,
         rating,
         clientId: client?.id || null,
@@ -43,6 +44,15 @@ export async function POST(req: NextRequest) {
       rating,
       content,
     }).catch(console.error);
+
+    if (email) {
+      sendReviewReceived({
+        reviewerName: name,
+        reviewerEmail: email,
+        rating,
+        content,
+      }).catch(console.error);
+    }
 
     return NextResponse.json({ success: true });
   } catch {

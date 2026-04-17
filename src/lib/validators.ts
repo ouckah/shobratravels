@@ -32,6 +32,7 @@ export const contactSchema = z.object({
 
 export const reviewSchema = z.object({
   name,
+  email: email.optional(),
   content: longText,
   rating: z.number().int().min(1).max(5).optional(),
 });

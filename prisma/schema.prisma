@@ -78,10 +78,11 @@ model Registration {
   passportImage   String?
   paymentMethod   String             // "credit_card" | "ach"
   status          RegistrationStatus @default(PENDING)
-  notes           String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  payments        Payment[]
+  notes                   String?
+  balanceReminderSentAt   DateTime?
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  payments                Payment[]
 
   @@unique([clientId, tripDateId])
 }
@@ -132,6 +133,7 @@ model Review {
   client    Client?  @relation(fields: [clientId], references: [id])
   clientId  String?
   name      String
+  email     String?
   content   String
   rating    Int      @default(5)
   approved  Boolean  @default(false)

@@ -9,17 +9,23 @@ export default function ReviewForm() {
   const [error, setError] = useState("");
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
-  const [form, setForm] = useState({ name: "", content: "" });
+  const [form, setForm] = useState({ name: "", email: "", content: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setError("");
     try {
+      const payload: Record<string, unknown> = {
+        name: form.name,
+        content: form.content,
+        rating,
+      };
+      if (form.email) payload.email = form.email;
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, rating }),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         setSubmitted(true);
@@ -61,6 +67,17 @@ export default function ReviewForm() {
           required
           value={form.name}
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+          className="w-full border-b-2 border-neutral-200 px-0 py-3 bg-transparent focus:outline-none focus:border-accent transition-colors"
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-widest text-neutral-500 mb-2">
+          Email <span className="text-neutral-400 normal-case tracking-normal">(optional — we'll let you know when your review is published)</span>
+        </label>
+        <input
+          type="email"
+          value={form.email}
+          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
           className="w-full border-b-2 border-neutral-200 px-0 py-3 bg-transparent focus:outline-none focus:border-accent transition-colors"
         />
       </div>

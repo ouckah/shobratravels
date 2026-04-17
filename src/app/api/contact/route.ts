@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { notifyNewContactMessage, sendContactReceived } from "@/lib/email";
 import { checkLimit, getClientIp, limiters } from "@/lib/ratelimit";
 import { contactSchema, formatZodError } from "@/lib/validators";
 
@@ -30,6 +31,9 @@ export async function POST(req: NextRequest) {
         clientId: client?.id || null,
       },
     });
+
+    notifyNewContactMessage({ name, email, message }).catch(console.error);
+    sendContactReceived({ name, email, message }).catch(console.error);
 
     return NextResponse.json({ success: true });
   } catch {

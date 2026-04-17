@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { processPayment, calculateDeposit } from "@/lib/square";
-import { notifyNewRegistration, notifyPaymentReceived } from "@/lib/email";
+import { notifyNewRegistration, notifyPaymentReceived, sendClientConfirmation } from "@/lib/email";
 import { checkLimit, getClientIp, limiters } from "@/lib/ratelimit";
 import { registerSchema, formatZodError } from "@/lib/validators";
 
@@ -131,6 +131,20 @@ export async function POST(req: NextRequest) {
       amount: total,
       method: paymentMethod,
       type: "DEPOSIT",
+    }).catch(console.error);
+
+    sendClientConfirmation({
+      clientName: fullName,
+      clientEmail: email,
+      tripTitle: trip.title,
+      departureDate: tripDate.departureDate,
+      returnDate: tripDate.returnDate,
+      base,
+      fee,
+      total,
+      paymentMethod,
+      squarePaymentId: squarePayment?.id || null,
+      paidAt: new Date(),
     }).catch(console.error);
 
     return NextResponse.json({
