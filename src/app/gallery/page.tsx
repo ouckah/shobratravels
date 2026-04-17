@@ -5,7 +5,15 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Gallery",
-  description: "Browse photos from our cultural and historical tours.",
+  description:
+    "Photos from Shobra Travel Agency's cultural and historical tours — our travelers, our destinations, and the moments that make each itinerary unique.",
+  alternates: { canonical: "/gallery" },
+  openGraph: {
+    title: "Gallery · Shobra Travel Agency",
+    description:
+      "Photos from Shobra Travel Agency's cultural and historical tours worldwide.",
+    url: "/gallery",
+  },
 };
 
 export default async function GalleryPage() {

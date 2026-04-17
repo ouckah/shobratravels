@@ -5,6 +5,7 @@ import { formatGroupSize } from "@/lib/trip";
 import type { Metadata } from "next";
 import TripBooking from "./TripBooking";
 import DatesDropdown from "./DatesDropdown";
+import { touristTripLd, breadcrumbLd, jsonLdScript, SITE_URL } from "@/lib/jsonld";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -12,7 +13,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const trip = await prisma.trip.findUnique({ where: { slug } });
   if (!trip) return {};
-  return { title: trip.title, description: trip.description.slice(0, 160) };
+
+  const description = trip.description.slice(0, 160);
+  const url = `${SITE_URL}/trips/${slug}`;
+  const image = trip.heroImage || "/logo.png";
+
+  return {
+    title: trip.title,
+    description,
+    alternates: { canonical: `/trips/${slug}` },
+    openGraph: {
+      type: "website",
+      url,
+      title: trip.title,
+      description,
+      siteName: "Shobra Travel Agency",
+      images: [{ url: image, alt: trip.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: trip.title,
+      description,
+      images: [image],
+    },
+  };
 }
 
 export default async function TripDetailPage({ params }: Props) {
@@ -41,8 +65,36 @@ export default async function TripDetailPage({ params }: Props) {
   ).length;
   const allFull = trip.dates.length > 0 && availableDateCount === 0;
 
+  const tripLd = touristTripLd({
+    title: trip.title,
+    description: trip.description,
+    slug: trip.slug,
+    destinations: trip.destinations,
+    duration: trip.duration,
+    pricePerPerson: trip.pricePerPerson,
+    heroImage: trip.heroImage,
+    departures: trip.dates.map((d) => ({
+      departureDate: d.departureDate,
+      returnDate: d.returnDate,
+    })),
+  });
+
+  const breadcrumbs = breadcrumbLd([
+    { name: "Home", url: "/" },
+    { name: "Trips", url: "/trips" },
+    { name: trip.title, url: `/trips/${trip.slug}` },
+  ]);
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(tripLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbs) }}
+      />
       {trip.heroImage && (
         <div className="relative h-[50vh] md:h-[60vh]">
           <img

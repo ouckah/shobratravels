@@ -4,6 +4,12 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import {
+  SITE_URL,
+  travelAgencyLd,
+  websiteLd,
+  jsonLdScript,
+} from "@/lib/jsonld";
 import "./globals.css";
 
 const rubik = Rubik({
@@ -18,13 +24,74 @@ const roboto = Roboto({
   weight: ["400", "500", "700"],
 });
 
+const TITLE_DEFAULT =
+  "Shobra Travel Agency | Cultural Historical Boutique Tours";
+const DESCRIPTION =
+  "Boutique travel agency curating cultural and historical group tours worldwide. Small-group departures, concierge service, and expert itineraries from Short Hills, New Jersey.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Shobra Travel Agency | Cultural Historical Boutique Tours",
+    default: TITLE_DEFAULT,
     template: "%s | Shobra Travel Agency",
   },
-  description:
-    "Curating extraordinary travel experiences for discerning travelers. Cultural and historical boutique tours from Short Hills, New Jersey.",
+  description: DESCRIPTION,
+  applicationName: "Shobra Travel Agency",
+  keywords: [
+    "boutique travel agency",
+    "cultural tours",
+    "historical tours",
+    "group travel",
+    "small group tours",
+    "New Jersey travel agency",
+    "Short Hills travel agency",
+    "Egypt tours",
+    "guided tours",
+    "luxury travel",
+  ],
+  authors: [{ name: "Shobra Travel Agency" }],
+  creator: "Shobra Travel Agency",
+  publisher: "Shobra Travel Agency",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: "Shobra Travel Agency",
+    title: TITLE_DEFAULT,
+    description: DESCRIPTION,
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "Shobra Travel Agency",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE_DEFAULT,
+    description: DESCRIPTION,
+    images: ["/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
+  other: {
+    "websitelaunches-verification": "dd527da1e9f0356cbefda8a7b769a347",
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +102,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${rubik.variable} ${roboto.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(travelAgencyLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteLd()) }}
+        />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

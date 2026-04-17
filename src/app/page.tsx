@@ -7,9 +7,10 @@ import { prisma } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  other: {
-    "websitelaunches-verification": "dd527da1e9f0356cbefda8a7b769a347",
-  },
+  title: "Shobra Travel Agency | Cultural Historical Boutique Tours",
+  description:
+    "Family-run boutique travel agency from Short Hills, NJ. Cultural and historical small-group tours with concierge service, expert itineraries, and trusted local partners worldwide.",
+  alternates: { canonical: "/" },
 };
 
 const pillars = [

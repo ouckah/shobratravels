@@ -8,7 +8,15 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Upcoming Trips",
-  description: "Explore our upcoming cultural and historical boutique tours.",
+  description:
+    "Browse Shobra Travel Agency's upcoming small-group cultural and historical tours — expertly curated itineraries with boutique hotels, local guides, and all-inclusive departures.",
+  alternates: { canonical: "/trips" },
+  openGraph: {
+    title: "Upcoming Trips",
+    description:
+      "Browse Shobra Travel Agency's upcoming small-group cultural and historical tours.",
+    url: "/trips",
+  },
 };
 
 export default async function TripsPage() {
